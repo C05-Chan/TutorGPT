@@ -1,0 +1,19 @@
+{
+  "name": "tutorgpt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "commonjs",
+  "dependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "scripts": {
+    "setup": "cd frontend && npm install && cd ../backend && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt",
+    "dev": "concurrently -n \"backend,frontend\" -c \"green,blue\" \"cd backend && venv/bin/python -m uvicorn main:app --reload\" \"cd frontend && npm run dev\"",
+    "start": "npm run dev"
+  },
+
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
