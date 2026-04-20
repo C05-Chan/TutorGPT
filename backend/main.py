@@ -1,13 +1,37 @@
-# python3 -m uvicorn main:app --reload
-
 from fastapi import FastAPI
+from pydantic import BaseModel
+from database import init_db, get_connection
 
 app = FastAPI()
 
-@app.get("/")
-def root():
-    return {"message": "Backend is working"}
+init_db()
 
-@app.get("/api/hello")
-def hello():
-    return {"message": "Hello from FastAPI 🚀"}
+# @app.post("/api/message")
+# def save_message(data: MessageRequest):
+#     conn = get_connection()
+#     cursor = conn.cursor()
+
+#     cursor.execute(
+#         "INSERT INTO messages (content) VALUES (?)",
+#         (data.content,)
+#     )
+
+#     conn.commit()
+#     conn.close()
+
+#     return {"message": "saved"}
+
+# @app.get("/api/messages")
+# def get_messages():
+#     conn = get_connection()
+#     cursor = conn.cursor()
+
+#     cursor.execute("SELECT * FROM messages")
+#     rows = cursor.fetchall()
+
+#     conn.close()
+
+#     return [
+#         {"id": row[0], "content": row[1]}
+#         for row in rows
+#     ]

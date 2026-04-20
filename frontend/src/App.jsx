@@ -1,47 +1,57 @@
-import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from "react"
+import "./App.css"
+
+// Components
+import { TopNavbar } from "../components/TopNavbar.jsx"
+import { Sidebar } from "../components/SideNavbar.jsx"
+
+// Pages
+import Home from "../pages/Home.jsx"
+import Chat from "../pages/NewChat.jsx"
+import Settings from "../pages/Settings.jsx"
+import ChatSelection from "../pages/ChatSelection.jsx"
+import Login from "../pages/Login.jsx"
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [page, setPage] = useState("home")
   const [message, setMessage] = useState("")
 
-  useEffect(() => {
-    fetch("/api/hello")
-      .then(res => res.json())
-      .then(data => setMessage(data.message))
-      .catch(err => console.error(err))
-  }, [])
+  const sendMessage = async () => {
+    const res = await fetch("/api/message", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ content: message }),
+    })
+
+    const data = await res.json()
+    console.log(data)
+    setMessage("")
+  }
+
+  if (page === "chat") {
+    return (
+      <div className="chat-layout">
+        <Sidebar setPage={setPage} />
+        <div className="chat-main">
+          <Chat />
+          <input value={message} onChange={(e) => setMessage(e.target.value)} />
+          <button onClick={sendMessage}>Send</button>
+        </div>
+      </div>
+    )
+  }
+
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
+      <TopNavbar setPage={setPage} />
 
-        <div>
-          <h1>Get started</h1>
-
-          {/* 👇 THIS IS YOUR BACKEND DATA */}
-          <p>Backend says: {message}</p>
-
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      {page === "home" && <Home />}
+      {page === "settings" && <Settings />}
+      {page === "chatselect" && <ChatSelection />}
+      {page === "login" && <Login />}
     </>
   )
 }
