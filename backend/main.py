@@ -92,3 +92,35 @@ def get_chats(user_id: int):
     connection.close()
 
     return {"chats": chats}
+
+@app.get("/api/userSettings")
+def get_user_settings(user_id: int):
+    connection = get_connection()
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM accountSettings WHERE userID = ?", (user_id,))
+    settings = cursor.fetchone()
+    connection.close()
+
+    return {"settings": {
+        "responseLength": settings[2],
+        "displayMode": settings[3],
+        "displayTextSize": settings[4],
+        "displayFontStyle": settings[5]
+    }}
+
+@app.post("/api/updateSettings")
+def update_settings(data: dict = Body(...)):
+    user_id = data["userID"]
+    response_length = data["responseLength"]
+    display_mode = data["displayMode"]
+    display_text_size = data["displayTextSize"]
+    display_font_style = data["displayFontStyle"]
+
+    connection = get_connection()
+    cursor = connection.cursor()
+    cursor.execute("UPDATE accountSettings SET responseLength = ?, displayMode = ?, displayTextSize = ?, displayFontStyle = ? WHERE userID = ? ",  (response_length, display_mode, display_text_size, display_font_style, user_id))
+    
+    connection.commit()
+    connection.close()
+
+    return {"success": True, "message": "Settings updated successfully."}

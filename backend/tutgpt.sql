@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS accountSettings (
 CREATE TABLE IF NOT EXISTS chatSession (
     chatSessionID INTEGER PRIMARY KEY,
     userID INTEGER NOT NULL,
-    chatTitle TEXT NOT NULL DEFAULT 'New Chat',
+    chatTitle TEXT NOT NULL,
     chatSubject TEXT,
     chatCreateDate TEXT DEFAULT (date('now')),
 
@@ -84,6 +84,7 @@ CREATE TABLE IF NOT EXISTS messageCitations (
     FOREIGN KEY (citationID) REFERENCES citations(citationID)
 );
 
-INSERT OR IGNORE INTO users (username, email, password) VALUES ('testuser', 'testuser@example.com', 'password123');
+INSERT OR IGNORE INTO users (username, email, password) VALUES ('Test User', 'testuser@example.com', 'password123');
 INSERT OR IGNORE INTO accountSettings (userID, responseLength, displayMode, displayTextSize, displayFontStyle) VALUES (1, 'Medium', 'Light', 'Medium', 'Arial');
+
 INSERT OR IGNORE INTO chatSession (userID, chatTitle, chatSubject) VALUES (1, 'Sample Chat', 'Mathematics');

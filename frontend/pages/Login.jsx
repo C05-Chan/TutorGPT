@@ -1,12 +1,8 @@
 import { useState } from "react"
 import ErrorPopup from "../components/ErrorMessage.jsx"
 
-function Login({ setPage }) {
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [error, setError] = useState("")
-
-    const handleLogin = async () => {
+async function handleLogin(email, password, setError, setPage) {
+    
         const res = await fetch("/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -34,6 +30,13 @@ function Login({ setPage }) {
         }
     }
 
+
+function Login({ setPage }) {
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const [error, setError] = useState("")
+
+
     return (
     <>
         <div className="login-form">
@@ -42,7 +45,7 @@ function Login({ setPage }) {
             <input onChange={(event) => setEmail(event.target.value)} />
             <label>Password: </label>
             <input onChange={(event) => setPassword(event.target.value)} />
-            <button onClick={handleLogin}>Login</button>
+            <button onClick={() => handleLogin(email, password, setError, setPage)}>Login</button>
 
         </div>
 
