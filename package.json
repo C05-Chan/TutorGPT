@@ -12,7 +12,6 @@
     "dev": "concurrently -n \"backend,frontend\" -c \"green,blue\" \"cd backend && venv/bin/python -m uvicorn main:app --reload\" \"cd frontend && npm run dev\"",
     "start": "npm run dev"
   },
-
   "keywords": [],
   "author": "",
   "license": "ISC"

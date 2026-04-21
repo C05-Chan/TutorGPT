@@ -1,13 +1,36 @@
 export function TopNavbar({ setPage }) {
   const goHome = () => setPage("home");
-  const goChat = () => setPage("settings");
+  const goSettings = () => setPage("settings");
   const goLogin = () => setPage("login");
 
+  if (localStorage.getItem("userID")) {
+    return (
+      <div className="navbar">
+        <div className="navbar-left">
+          <button onClick={goHome}>Home</button>
+        </div>
+        
+        <h1 className="logo">Tutor-GPT</h1>
+        
+        <div className="navbar-right">
+          <button onClick={goSettings}>Settings</button>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div>
-      <button className="Home" onClick={goHome}>Home</button>
-      <button className="Settings" onClick={goChat}>Settings </button>
-      <button className="Login" onClick={goLogin}>Login</button>
+    <div className="navbar">
+      <div className="navbar-left">
+        <button onClick={goHome}>Home</button>
+      </div>
+      
+      <h1 className="logo">Tutor-GPT</h1>
+      
+      <div className="navbar-right">
+        <button onClick={goSettings}>Settings</button>
+        <button onClick={goLogin}>Login</button>
+      </div>
     </div>
-  );
-}
+  )
+};
