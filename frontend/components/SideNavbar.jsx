@@ -1,4 +1,4 @@
- export function Sidebar({ setPage }) {
+ export default function Sidebar({ setPage }) {
   return (
     <div style={{ width: "200px" }}>
       <button onClick={() => setPage("home")}>Home</button>

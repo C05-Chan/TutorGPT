@@ -1,4 +1,4 @@
-export function TopNavbar({ setPage }) {
+export default function TopNavbar({ setPage }) {
   const goHome = () => setPage("home");
   const goSettings = () => setPage("settings");
   const goLogin = () => setPage("login");

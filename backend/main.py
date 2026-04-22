@@ -1,12 +1,12 @@
-from unittest import result
-# import bycrypt
 from fastapi import FastAPI, Body
 from database import init_db, get_connection
+from dotenv import load_dotenv
+from aiservice import call_ai
+
+load_dotenv("API.env")
 
 app = FastAPI()
-
 init_db()
-
 
 @app.post("/api/login")
 def login(email: str = Body(...), password: str = Body(...)):
@@ -19,7 +19,7 @@ def login(email: str = Body(...), password: str = Body(...)):
     if result:
         return {"success": True, "userID": result[0]}
     else:
-        return {"error": False, "message": "Invalid Email or Password. Please Try Again."}
+        return {"error": True   , "message": "Invalid Email or Password. Please Try Again."}
     
 
 
@@ -73,7 +73,6 @@ def reset_password(data: dict = Body(...)):
     new_password = data["password"]
     email = data["email"].lower()
 
-
     connection = get_connection()
     cursor = connection.cursor()
     cursor.execute("UPDATE users SET password = ? WHERE email = ?", (new_password, email))
@@ -124,3 +123,55 @@ def update_settings(data: dict = Body(...)):
     connection.close()
 
     return {"success": True, "message": "Settings updated successfully."}
+
+@app.post("/api/createtempchat")
+def create_temp_chat(data: dict = Body(...)):
+    temp_chat_title = data["tempChatTitle"]
+    temp_chat_subject = data["tempChatSubject"]
+
+    connection = get_connection()
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM tempChats")  # clear old temp chat
+    cursor.execute("INSERT INTO tempChats (tempChatTitle, tempChatSubject) VALUES (?, ?)", (temp_chat_title, temp_chat_subject))
+    connection.commit()
+    connection.close()
+
+    return {"success": True, "tempChatID": 1, "message": "Temporary chat created successfully."}
+
+@app.post("/api/createchat")
+def new_chat(data: dict = Body(...)):
+    user_id = data["userID"]
+    chat_title = data["chatTitle"]
+    chat_subject = data["chatSubject"]
+
+    connection = get_connection()
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO chatSession (userID, chatTitle, chatSubject) VALUES (?, ?, ?)", (user_id, chat_title, chat_subject))
+    connection.commit()
+    connection.close()
+
+    return {"success": True, "message": "New chat session created successfully."}
+
+@app.get("/api/tempchats")
+def get_temp_chats(tempChatID: int):
+    connection = get_connection()
+    cursor = connection.cursor()
+    cursor.execute("SELECT tempChatID, tempChatTitle FROM tempChats WHERE tempChatID = ?", (tempChatID,))
+    temp_chats = cursor.fetchall()
+    connection.close()
+
+    return {"tempChats": temp_chats}
+
+
+@app.post("/api/saveprompt")
+def submit_prompt(data: dict = Body(...)):
+    prompt = data["prompt"]
+    chatSessionID = data["chatSessionID"]
+    
+    connection = get_connection()
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO messages (chatSessionID, sender, messageContent) VALUES (?, ?, ?)", (chatSessionID, "user", prompt))
+    connection.commit()
+    connection.close()
+
+    return {"success": True, "message": "Prompt submitted successfully."}

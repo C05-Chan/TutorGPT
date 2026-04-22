@@ -2,8 +2,8 @@ import { useState } from "react"
 import "./App.css"
 
 // Components
-import { TopNavbar } from "../components/TopNavbar.jsx"
-import { Sidebar } from "../components/SideNavbar.jsx"
+import TopNavbar from "../components/TopNavbar.jsx"
+import Sidebar from "../components/SideNavbar.jsx"
 
 // Pages
 import Home from "../pages/Home.jsx"
@@ -11,6 +11,7 @@ import Settings from "../pages/Settings.jsx"
 import Login from "../pages/Login.jsx"
 import Signup from "../pages/Signup.jsx"
 import ResetPassword from "../pages/ResetPwd.jsx"
+import NewChatInfo from "../pages/NewChatInfo.jsx"
 import NewChat from "../pages/NewChat.jsx"
 import ContinueChat from "../pages/ContinueChat.jsx"
 
@@ -41,6 +42,7 @@ function App() {
       {page === "signup" && <Signup setPage={setPage} />}
       {page === "resetpwd" && <ResetPassword setPage={setPage} />}
       {page === "newchat" && <NewChat  />}
+      {page === "newchatinfo" && <NewChatInfo setPage={setPage} />}
       {page === "continuechat" && <ContinueChat  />}
     </>
   )

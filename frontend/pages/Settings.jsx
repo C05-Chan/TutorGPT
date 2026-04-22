@@ -16,8 +16,9 @@ async function saveUserSettings(userID, responseLength, displayMode, displayText
         localStorage.setItem("displayMode", displayMode)
         localStorage.setItem("displayTextSize", displayTextSize)
         localStorage.setItem("displayFontStyle", displayFontStyle)
+        console.log("Settings saved to localStorage for non-logged-in user. Response Length:", responseLength, "Display Mode:", displayMode, "Text Size:", displayTextSize, "Font Style:", displayFontStyle)
     } else { 
-        console.log("Saving settings for userID:", userID, "Response Length:", responseLength, "Display Mode:", displayMode, "Text Size:", displayTextSize, "Font Style:", displayFontStyle)
+
         const res = await fetch("/api/updateSettings", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -28,11 +29,27 @@ async function saveUserSettings(userID, responseLength, displayMode, displayText
 
         if (data.success) {
             console.log("Settings saved successfully.")
+            console.log("Saving settings for userID:", userID, "Response Length:", responseLength, "Display Mode:", displayMode, "Text Size:", displayTextSize, "Font Style:", displayFontStyle)
         } else {
             console.error("Failed to save settings:", data.message)
         }
     }
 }   
+
+async function loadSettings(userID, setResponseLength, setDisplayMode, setDisplayTextSize, setDisplayFontStyle) {
+    if (userID) {
+        const settings = await getUserSettings(userID)
+            setResponseLength(settings.responseLength)
+            setDisplayMode(settings.displayMode)
+            setDisplayTextSize(settings.displayTextSize)
+            setDisplayFontStyle(settings.displayFontStyle)
+    } else {
+        setResponseLength(localStorage.getItem("responseLength"))
+        setDisplayMode(localStorage.getItem("displayMode"))
+        setDisplayTextSize(localStorage.getItem("displayTextSize"))
+        setDisplayFontStyle(localStorage.getItem("displayFontStyle"))
+    }
+}
 
 function Settings() {
     const [responseLength, setResponseLength] = useState("")
@@ -43,17 +60,7 @@ function Settings() {
     const userID = localStorage.getItem("userID")
 
     useEffect(() => {
-        if (userID) {
-            const fetchSettings = async () => {
-                const settings = await getUserSettings(userID)
-                console.log("Fetched settings:", settings)
-                setResponseLength(settings.responseLength)
-                setDisplayMode(settings.displayMode)
-                setDisplayTextSize(settings.displayTextSize)
-                setDisplayFontStyle(settings.displayFontStyle)
-            }
-            fetchSettings()
-        }
+        loadSettings(userID, setResponseLength, setDisplayMode, setDisplayTextSize, setDisplayFontStyle)
     }, [])
 
     const handleLogout = () => {
@@ -89,9 +96,7 @@ function Settings() {
                 <option value="Courier New">Courier New</option>
             </select>
 
-            <button onClick={() => saveUserSettings(userID ?? 'null', responseLength, displayMode, displayTextSize, displayFontStyle)}>
-                Save Settings
-            </button>
+            <button onClick={() => saveUserSettings(userID ?? 'null', responseLength, displayMode, displayTextSize, displayFontStyle)}>Save Settings</button>
             {userID && <button onClick={handleLogout}>Logout</button>}
         </div>
     )

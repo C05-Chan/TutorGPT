@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     username TEXT NOT NULL,
     email TEXT UNIQUE,
     password TEXT NOT NULL,
-    createDate TEXT DEFAULT (date('now')),
+    createDate TEXT DEFAULT (DATE('now')),
     deleteDate TEXT
 );
 
@@ -24,12 +24,20 @@ CREATE TABLE IF NOT EXISTS accountSettings (
     CHECK(displayFontStyle IN ('Arial', 'Times New Roman', 'Courier New'))
 );
 
+CREATE TABLE IF NOT EXISTS tempChats (
+    tempChatID INTEGER PRIMARY KEY,
+    tempChatTitle TEXT NOT NULL,
+    tempChatSubject TEXT,
+    tempChatCreateDate TEXT DEFAULT (DATETIME('now'))
+);
+
+
 CREATE TABLE IF NOT EXISTS chatSession (
     chatSessionID INTEGER PRIMARY KEY,
     userID INTEGER NOT NULL,
     chatTitle TEXT NOT NULL,
     chatSubject TEXT,
-    chatCreateDate TEXT DEFAULT (date('now')),
+    chatCreateDate TEXT DEFAULT (DATETIME('now')),
 
     FOREIGN KEY (userID) REFERENCES users(userID)
 );
@@ -40,7 +48,7 @@ CREATE TABLE IF NOT EXISTS messages (
     chatSessionID INTEGER NOT NULL,
     sender TEXT NOT NULL,
     messageContent TEXT NOT NULL,
-    messageTime TEXT DEFAULT (datetime('now')),
+    messageTime TEXT DEFAULT (DATETIME('now')),
 
     FOREIGN KEY (chatSessionID) REFERENCES chatSession(chatSessionID),
 
