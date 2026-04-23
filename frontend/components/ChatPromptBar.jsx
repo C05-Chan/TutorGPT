@@ -13,6 +13,11 @@ async function handlePrompt(prompt, setError, timer, setLastSubmit, setPrompt, m
         setError("")
     }
 
+    const newMessages = [...messages] 
+    newMessages.push([null, prompt, "User"])
+    setMessage(newMessages)
+    setPrompt("")
+    
     if (localStorage.getItem("userID")) {
         const res = await fetch("/api/submitloggedprompt", {
             method: "POST",
@@ -24,10 +29,9 @@ async function handlePrompt(prompt, setError, timer, setLastSubmit, setPrompt, m
 
         if (data.success) {
             console.log("Prompt submitted successfully:", prompt)
-            const newMessages = [...messages] 
-            newMessages.push([null, prompt, "User"])
-            setMessage(newMessages)
-            setPrompt("")
+            const newMessagesAndResponse = [...newMessages]
+            newMessagesAndResponse.push([null, data.message,"Tutor-GPT"])
+            setMessage(newMessagesAndResponse)
             setLastSubmit(Date.now())
         }
     } else {
@@ -41,10 +45,9 @@ async function handlePrompt(prompt, setError, timer, setLastSubmit, setPrompt, m
 
         if (data.success) {
             console.log("Prompt submitted successfully:", prompt)
-            const newMessages = [...messages] 
-            newMessages.push([null, prompt, "User"])
-            setMessage(newMessages)
-            setPrompt("")
+            const newMessagesAndResponse = [...newMessages]
+            newMessagesAndResponse.push([null, data.message,"Tutor-GPT"])
+            setMessage(newMessagesAndResponse)
             setLastSubmit(Date.now())
             
         }

@@ -218,25 +218,29 @@ def new_chat(data: dict = Body(...)):
 def submit_logged_prompt(data: dict = Body(...)):
     prompt = data["prompt"]
     chatSessionID = data["chatSessionID"]
+    ai_response = "This is a placeholder AI response."
     
     connection = get_connection()
     cursor = connection.cursor()
     cursor.execute("INSERT INTO messages (chatSessionID, sender, messageContent) VALUES (?, ?, ?)", (chatSessionID, "User", prompt))
+    cursor.execute("INSERT INTO messages (chatSessionID, sender, messageContent) VALUES (?, ?, ?)", (chatSessionID, "TutorGPT", ai_response))
     connection.commit()
     connection.close()
 
-    return {"success": True, "message": "Prompt submitted successfully."}
+    return {"success": True, "message": ai_response}
 
 
 @app.post("/api/submitunloggedprompt")
 def submit_unlogged_prompt(data: dict = Body(...)):
     prompt = data["prompt"]
     tempChatID = data["tempChatID"]
+    ai_response = "This is a placeholder AI response."
     
     connection = get_connection()
     cursor = connection.cursor()
     cursor.execute("INSERT INTO messages (tempChatID, sender, messageContent) VALUES (?, ?, ?)", (tempChatID, "User", prompt))
+    cursor.execute("INSERT INTO messages (tempChatID, sender, messageContent) VALUES (?, ?, ?)", (tempChatID, "TutorGPT", ai_response))
     connection.commit()
     connection.close()
 
-    return {"success": True, "message": "Prompt submitted successfully."}
+    return {"success": True, "message": ai_response}

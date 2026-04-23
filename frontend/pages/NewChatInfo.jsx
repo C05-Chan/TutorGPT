@@ -31,7 +31,7 @@ async function handleCreate(title, subject, level, setError, setPage) {
     const res = await fetch("/api/createchat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userID: userID, chatTitle: title, chatSubject: subject, tempChatExplanationLevel: level })
+        body: JSON.stringify({ userID: userID, chatTitle: title, chatSubject: subject, chatExplanationLevel: level })
     })
 
     const data = await res.json()
