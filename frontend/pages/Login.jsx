@@ -21,7 +21,6 @@ async function handleLogin(email, password, setError, setPage) {
 
             localStorage.setItem("userID", data.userID)
             localStorage.setItem("username", data.username)
-            
             setPage("home")
 
         } else {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 async function fetchChats() {
-    const res = await fetch(`/api/chats?user_id=${localStorage.getItem("userID")}`, {
+    const res = await fetch(`/api/retrievechats?user_id=${localStorage.getItem("userID")}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
@@ -13,7 +13,7 @@ async function fetchChats() {
 }
 
 async function fetchTempChats() {
-    const res = await fetch(`/api/tempchats?tempChatID=${localStorage.getItem("tempChatID")}`, {
+    const res = await fetch(`/api/retrievetempchats?tempChatID=${localStorage.getItem("tempChatID")}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
@@ -49,7 +49,7 @@ function Home({ setPage }) {
             chatLists.push(
                 <button key={i} className="btn-selections" 
                 onClick={() => {
-                    localStorage.setItem("chatSessionID", chats[i][0]);
+                    localStorage.setItem("chatSessionID", chats[i][0]); // Store the chatSessionID in localStorage
                     setPage("continuechat");
                 }}>Continue Chat: {chats[i][1]}</button>
             );
@@ -57,13 +57,23 @@ function Home({ setPage }) {
 
         console.log("chatLists:", chatLists)
 
-        return (
-            <div>
-                <h2>Hello {localStorage.getItem("username")}!</h2>
-                <button className="btn-selections" onClick={() => setPage("newchatinfo")}>+</button>
-                {chatLists}
-            </div>
-        );
+        if (localStorage.getItem("username")) {
+            return (
+                <div>
+                    <h2>Welcombe back {localStorage.getItem("username")}!</h2>
+                    <button className="btn-selections" onClick={() => setPage("newchatinfo")}>+</button>
+                    {chatLists}
+                </div>
+            );
+        } else {
+            return (
+                <div>
+                    <h2>Welcome back!</h2>
+                    <button className="btn-selections" onClick={() => setPage("newchatinfo")}>+</button>
+                    {chatLists}
+                </div>
+            );
+        }
     }
 
     return (

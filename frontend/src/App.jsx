@@ -20,12 +20,13 @@ function App() {
   // const [message, setMessage] = useState("message")
 
 
-  if (page === "chat") {
+  if (page === "newchat"  || page === "continuechat") {
     return (
       <div className="chat-layout">
         <Sidebar setPage={setPage} />
         <div className="chat-main">
-          <Chat />
+          {page === "continuechat" && <ContinueChat  />}
+          {page === "newchat" && <NewChat  />}
         </div>
       </div>
     )
@@ -41,9 +42,7 @@ function App() {
       {page === "login" && <Login setPage={setPage} />}
       {page === "signup" && <Signup setPage={setPage} />}
       {page === "resetpwd" && <ResetPassword setPage={setPage} />}
-      {page === "newchat" && <NewChat  />}
       {page === "newchatinfo" && <NewChatInfo setPage={setPage} />}
-      {page === "continuechat" && <ContinueChat  />}
     </>
   )
 }

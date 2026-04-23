@@ -16,18 +16,14 @@ CREATE TABLE IF NOT EXISTS accountSettings (
     displayTextSize TEXT NOT NULL DEFAULT 'Medium',
     displayFontStyle TEXT NOT NULL DEFAULT 'Arial',
 
-    FOREIGN KEY (userID) REFERENCES users(userID),
-
-    CHECK(responseLength IN ('Short', 'Medium', 'Long')),
-    CHECK(displayMode IN ('Light', 'Dark')),
-    CHECK(displayTextSize IN ('Small', 'Medium', 'Large')),
-    CHECK(displayFontStyle IN ('Arial', 'Times New Roman', 'Courier New'))
+    FOREIGN KEY (userID) REFERENCES users(userID)
 );
 
 CREATE TABLE IF NOT EXISTS tempChats (
     tempChatID INTEGER PRIMARY KEY,
     tempChatTitle TEXT NOT NULL,
-    tempChatSubject TEXT,
+    tempChatSubject TEXT NOT NULL,
+    tempChatExplanationLevel TEXT NOT NULL,
     tempChatCreateDate TEXT DEFAULT (DATETIME('now'))
 );
 
@@ -36,7 +32,8 @@ CREATE TABLE IF NOT EXISTS chatSession (
     chatSessionID INTEGER PRIMARY KEY,
     userID INTEGER NOT NULL,
     chatTitle TEXT NOT NULL,
-    chatSubject TEXT,
+    chatSubject TEXT NOT NULL,
+    chatExplanationLevel TEXT NOT NULL,
     chatCreateDate TEXT DEFAULT (DATETIME('now')),
 
     FOREIGN KEY (userID) REFERENCES users(userID)
@@ -45,14 +42,18 @@ CREATE TABLE IF NOT EXISTS chatSession (
 -- MESSAGES
 CREATE TABLE IF NOT EXISTS messages (
     messageID INTEGER PRIMARY KEY,
-    chatSessionID INTEGER NOT NULL,
+    chatSessionID INTEGER,
+    tempChatID INTEGER,
     sender TEXT NOT NULL,
     messageContent TEXT NOT NULL,
     messageTime TEXT DEFAULT (DATETIME('now')),
 
     FOREIGN KEY (chatSessionID) REFERENCES chatSession(chatSessionID),
+    FOREIGN KEY (tempChatID) REFERENCES tempChats(tempChatID),
 
-    CHECK(sender IN ('User', 'TutorGPT'))
+    CHECK(sender IN ('User', 'TutorGPT')),
+    CHECK((chatSessionID IS NOT NULL AND tempChatID IS NULL) OR (chatSessionID IS NULL AND tempChatID IS NOT NULL)
+    )
 );
 
 -- UPLOADED DOCUMENTS
@@ -93,6 +94,10 @@ CREATE TABLE IF NOT EXISTS messageCitations (
 );
 
 INSERT OR IGNORE INTO users (username, email, password) VALUES ('Test User', 'testuser@example.com', 'password123');
+
 INSERT OR IGNORE INTO accountSettings (userID, responseLength, displayMode, displayTextSize, displayFontStyle) VALUES (1, 'Medium', 'Light', 'Medium', 'Arial');
 
-INSERT OR IGNORE INTO chatSession (userID, chatTitle, chatSubject) VALUES (1, 'Sample Chat', 'Mathematics');
+INSERT OR IGNORE INTO chatSession (userID, chatTitle, chatSubject, chatExplanationLevel) VALUES (1, 'Sample Chat', 'Mathematics', 'Advanced');
+
+INSERT OR IGNORE INTO messages (chatSessionID, sender, messageContent) VALUES (1, 'User', 'This is user logged example messagge'),
+(1, 'TutorGPT', 'This is system response to logged example message');
