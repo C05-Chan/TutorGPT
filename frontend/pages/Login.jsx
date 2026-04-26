@@ -1,34 +1,33 @@
 import { useState } from "react"
 import ErrorPopup from "../components/ErrorMessage.jsx"
+import { localStorageSettingsLoader, getUserInfo } from "../utility.jsx"
+
 
 async function handleLogin(email, password, setError, setPage) {
+    if (!email || !password) {
+        setError("Please fill all fields.")
+        return;
+    }
+    const emailCheck = email.toLowerCase()
     
         const res = await fetch("/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email: emailCheck, password })
         })
 
         const data = await res.json()
 
         if (data.success) {
-            const res = await fetch(`/api/userinfo?email=${email}`, {
-                method: "GET",
-                headers: { "Content-Type": "application/json" },
-            });
-            
-            const data = await res.json()
-
-            localStorage.setItem("userID", data.userID)
-            localStorage.setItem("username", data.username)
+            const userID = await getUserInfo(emailCheck)
+            await localStorageSettingsLoader(userID)
             setPage("home")
 
         } else {
-            setError(data.message)
+            setError("Unable to Login. Please check details")
             console.error("Login failed:", data.message)
         }
     }
-
 
 function Login({ setPage }) {
     const [email, setEmail] = useState("")

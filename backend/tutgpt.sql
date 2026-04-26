@@ -10,13 +10,14 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS accountSettings (
     accountSettingsID INTEGER PRIMARY KEY,
-    userID INTEGER NOT NULL,
+    userID INTEGER NOT NULL UNIQUE,
     responseLength TEXT NOT NULL DEFAULT 'Medium',
     displayMode TEXT NOT NULL DEFAULT 'Light',
     displayTextSize TEXT NOT NULL DEFAULT 'Medium',
     displayFontStyle TEXT NOT NULL DEFAULT 'Arial',
 
-    FOREIGN KEY (userID) REFERENCES users(userID)
+    FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE
+
 );
 
 CREATE TABLE IF NOT EXISTS tempChats (
@@ -36,7 +37,7 @@ CREATE TABLE IF NOT EXISTS chatSession (
     chatExplanationLevel TEXT NOT NULL,
     chatCreateDate TEXT DEFAULT (DATETIME('now')),
 
-    FOREIGN KEY (userID) REFERENCES users(userID)
+    FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE
 );
 
 -- MESSAGES
@@ -48,25 +49,24 @@ CREATE TABLE IF NOT EXISTS messages (
     messageContent TEXT NOT NULL,
     messageTime TEXT DEFAULT (DATETIME('now')),
 
-    FOREIGN KEY (chatSessionID) REFERENCES chatSession(chatSessionID),
-    FOREIGN KEY (tempChatID) REFERENCES tempChats(tempChatID),
+    FOREIGN KEY (chatSessionID) REFERENCES chatSession(chatSessionID) ON DELETE CASCADE,
+    FOREIGN KEY (tempChatID) REFERENCES tempChats(tempChatID) ON DELETE CASCADE,
 
     CHECK(sender IN ('User', 'TutorGPT')),
     CHECK((chatSessionID IS NOT NULL AND tempChatID IS NULL) OR (chatSessionID IS NULL AND tempChatID IS NOT NULL)
     )
 );
 
--- UPLOADED DOCUMENTS
 CREATE TABLE IF NOT EXISTS uploadedDocuments (
     documentID INTEGER PRIMARY KEY,
-    userID INTEGER NOT NULL,
+    chatSessionID INTEGER NOT NULL,
     fileName TEXT NOT NULL,
     fileType TEXT NOT NULL,
     filePath TEXT NOT NULL,
     fileSize INTEGER NOT NULL,
     uploadTime TEXT DEFAULT (datetime('now')),
 
-    FOREIGN KEY (userID) REFERENCES users(userID)
+    FOREIGN KEY (chatSessionID) REFERENCES chatSession(chatSessionID) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS citations (
@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS citations (
     citationText TEXT NOT NULL,
     citationURL TEXT NOT NULL,
 
-    FOREIGN KEY (documentID) REFERENCES uploadedDocuments(documentID),
+    FOREIGN KEY (documentID) REFERENCES uploadedDocuments(documentID) ON DELETE CASCADE,
 
     CHECK (citationSource != 'Uploaded Document' OR documentID IS NOT NULL),
     CHECK(citationSource IN ('Uploaded Document', 'External Source')),
@@ -89,8 +89,8 @@ CREATE TABLE IF NOT EXISTS messageCitations (
     citationID INTEGER NOT NULL,
 
     PRIMARY KEY (messageID, citationID),
-    FOREIGN KEY (messageID) REFERENCES messages(messageID),
-    FOREIGN KEY (citationID) REFERENCES citations(citationID)
+    FOREIGN KEY (messageID) REFERENCES messages(messageID) ON DELETE CASCADE,
+    FOREIGN KEY (citationID) REFERENCES citations(citationID) ON DELETE CASCADE
 );
 
 INSERT OR IGNORE INTO users (username, email, password) VALUES ('Test User', 'testuser@example.com', 'password123');

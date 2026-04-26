@@ -1,9 +1,8 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import "./App.css"
 
 // Components
 import TopNavbar from "../components/TopNavbar.jsx"
-import Sidebar from "../components/SideNavbar.jsx"
 
 // Pages
 import Home from "../pages/Home.jsx"
@@ -20,29 +19,18 @@ function App() {
   // const [message, setMessage] = useState("message")
 
 
-  if (page === "newchat"  || page === "continuechat") {
-    return (
-      <div className="chat-layout">
-        <Sidebar setPage={setPage} />
-        <div className="chat-main">
-          {page === "continuechat" && <ContinueChat  />}
-          {page === "newchat" && <NewChat  />}
-        </div>
-      </div>
-    )
-  }
-
-
   return (
     <>
       <TopNavbar setPage={setPage} />
 
       {page === "home" && <Home setPage={setPage} />}
-      {page === "settings" && <Settings />}
+      {page === "settings" && <Settings setPage={setPage} />}
       {page === "login" && <Login setPage={setPage} />}
       {page === "signup" && <Signup setPage={setPage} />}
       {page === "resetpwd" && <ResetPassword setPage={setPage} />}
       {page === "newchatinfo" && <NewChatInfo setPage={setPage} />}
+      {page === "continuechat" && <ContinueChat  />}
+      {page === "newchat" && <NewChat  />}
     </>
   )
 }

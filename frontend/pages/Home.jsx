@@ -25,16 +25,48 @@ async function fetchTempChats() {
 }  
 
 async function loadChats(setChats) {
+    console.log("loadChats called")
     if (!localStorage.getItem("userID") && localStorage.getItem("tempChatID")) {
         const chats = await fetchTempChats();
+        console.log("fetched chats:", chats)
         setChats(chats || []);
     } else if (localStorage.getItem("userID")) {
         const chats = await fetchChats();
+        console.log("fetched chats:", chats)
         setChats(chats || []);
     } else {
         setChats([]);
     }
 }
+
+async function deleteChat(chatSessionID, setChats) {
+    console.log("deleteChat called", chatSessionID)
+    
+    if (!localStorage.getItem("userID")) {
+        const res = await fetch("/api/deletetempchat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ tempChatID: chatSessionID })
+        })
+        const data = await res.json()
+        if (data.success) {
+            loadChats(setChats)
+            return;
+        }
+    }
+
+    const res = await fetch("/api/deletechat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chatSessionID })
+    })
+    const data = await res.json()
+
+    if (data.success) {
+        loadChats(setChats)
+    }
+}
+
 
 function Home({ setPage }) {
     const [chats, setChats] = useState([]);
@@ -47,11 +79,19 @@ function Home({ setPage }) {
         const chatLists = [];
         for (let i = 0; i < chats.length; i++) {
             chatLists.push(
-                <button key={i} className="btn-selections" 
-                onClick={() => {
-                    localStorage.setItem("chatSessionID", chats[i][0]); // Store the chatSessionID in localStorage
-                    setPage("continuechat");
-                }}>Continue Chat: {chats[i][1]}</button>
+                <div key={i} className="chat-item">
+                    <button className="btn-selections" 
+                        onClick={() => {
+                            localStorage.setItem("chatSessionID", chats[i][0]);
+                            setPage("continuechat");
+                        }}>
+                        Continue Chat: {chats[i][1]}
+                    </button>
+                    <button 
+                    onClick={() => {
+                        console.log("delete clicked", chats[i][0]) 
+                        deleteChat(chats[i][0], setChats)}}>Delete</button>
+                </div>
             );
         }
 

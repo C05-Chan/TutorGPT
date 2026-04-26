@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import ChatPromptBar from "../components/ChatPromptBar"
+import Citations  from "../components/Citations"
 
 async function fetchChatInfo(setChatTitle) {
     if (localStorage.getItem("userID")) {
@@ -26,13 +27,21 @@ async function fetchChatInfo(setChatTitle) {
     }
 }
 
+async function fetchDocuments(setUploadedDoc) {
+    const chatID = localStorage.getItem("chatSessionID")
+    const res = await fetch(`/api/getdocument?chatSessionID=${chatID}`)
+    const data = await res.json()
+    setUploadedDoc(data.documents[0] || null) 
+}
 
 function NewChat() {
     const [chatTitle, setChatTitle] = useState("")
     const [messages, setMessage] = useState([])
+    const [uploadedDoc, setUploadedDoc] = useState(null)
 
     useEffect(() => {
         fetchChatInfo(setChatTitle)
+        fetchDocuments(setUploadedDoc)
     }, [])
 
     let messagesList = [];
@@ -44,13 +53,26 @@ function NewChat() {
         );
     }
 
+    if (uploadedDoc) {
+        return (
+            <div className="new-chat-container">
+                <Citations></Citations>
+                <h2>{chatTitle}</h2>
+                <p>Refers to this document: <a href={`/api/getfile?chatSessionID=${localStorage.getItem("chatSessionID")}`} download>
+    {uploadedDoc[0]} </a> </p>
+
+                {messagesList}
+                <ChatPromptBar messages={messages} setMessage={setMessage} />
+            </div>
+        )
+    }
     return (
         <div className="new-chat-container">
+            <Citations></Citations>
             <h2>{chatTitle}</h2>
             {messagesList}
             <ChatPromptBar messages={messages} setMessage={setMessage} />
         </div>
-    )
+            )
 }
-
 export default NewChat

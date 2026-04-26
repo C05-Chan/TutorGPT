@@ -1,5 +1,6 @@
 import { useState } from "react"
 import ErrorPopup from "../components/ErrorMessage.jsx"
+import { localStorageSettingsLoader, getUserInfo } from "../utility.jsx"
 
 async function handleSignup(username, email, password, confirmPassword, setError, setPage) {
     if (!username || !email || !password) {
@@ -37,7 +38,8 @@ async function handleSignup(username, email, password, confirmPassword, setError
         return setError("Passwords do not match.")
     }
     else if (email) {
-        const res = await fetch(`/api/emailcheck?email=${email}`, {
+        const emailSignUp = email.toLowerCase()
+        const res = await fetch(`/api/emailcheck?email=${emailSignUp}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
@@ -50,31 +52,25 @@ async function handleSignup(username, email, password, confirmPassword, setError
         }
     }
 
+    const emailSignUp = email.toLowerCase()
     const res = await fetch("/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password })
+        body: JSON.stringify({ username, email: emailSignUp, password })
     })
 
     const data = await res.json()
 
     if (data.success) {
-        const res = await fetch(`/api/userinfo?email=${email}`, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-        });
-        
-        const data = await res.json()
-
-        localStorage.setItem("userID", data.userID)
-        localStorage.setItem("username", data.username)
-        
+        const userID = await getUserInfo(emailSignUp)
+        await localStorageSettingsLoader(userID)
         setPage("home")
     } else {
         setError(data.message)
         console.error("Signup failed:", data.message)
     }
 }
+
 
 function Signup({ setPage }) {
     const [username, setUsername] = useState("")

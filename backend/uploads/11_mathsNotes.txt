@@ -1,0 +1,152 @@
+MATHEMATICS REVISION NOTES
+
+========================================
+1. ALGEBRA
+========================================
+An expression is a combination of variables, numbers, and operations.
+An equation states that two expressions are equal.
+
+Expanding brackets:
+a(b + c) = ab + ac
+
+Factorising:
+ab + ac = a(b + c)
+
+Indices rules:
+a^m × a^n = a^(m+n)
+a^m ÷ a^n = a^(m-n)
+(a^m)^n = a^(mn)
+
+========================================
+2. LINEAR EQUATIONS
+========================================
+General form:
+y = mx + b
+
+m = gradient (slope)
+b = y-intercept
+
+Gradient formula:
+m = (y2 - y1) / (x2 - x1)
+
+Parallel lines have the same gradient.
+Perpendicular lines have gradients that multiply to -1.
+
+========================================
+3. QUADRATICS
+========================================
+Standard form:
+ax^2 + bx + c = 0
+
+Quadratic formula:
+x = (-b ± √(b^2 - 4ac)) / (2a)
+
+Discriminant:
+b^2 - 4ac
+> 0 → two real solutions
+= 0 → one solution
+< 0 → no real solutions
+
+========================================
+4. GEOMETRY
+========================================
+Angles:
+Triangle = 180°
+Quadrilateral = 360°
+
+Pythagoras' theorem:
+a^2 + b^2 = c^2
+
+Circle formulas:
+Area = πr^2
+Circumference = 2πr
+
+Volume:
+Cube = side^3
+Cylinder = πr^2h
+
+========================================
+5. TRIGONOMETRY
+========================================
+SOH CAH TOA:
+sinθ = opposite/hypotenuse
+cosθ = adjacent/hypotenuse
+tanθ = opposite/adjacent
+
+sin^2θ + cos^2θ = 1
+
+Degrees ↔ radians:
+180° = π radians
+
+========================================
+6. STATISTICS
+========================================
+Mean = sum ÷ total
+Median = middle value
+Mode = most frequent value
+
+Range = max - min
+
+Probability:
+0 ≤ P ≤ 1
+
+Independent events:
+P(A and B) = P(A) × P(B)
+
+========================================
+7. CALCULUS (BASICS)
+========================================
+Derivative:
+Rate of change
+
+d/dx (x^n) = nx^(n-1)
+
+Integral:
+∫ x^n dx = (x^(n+1)) / (n+1)
+
+Area under curve found using integration.
+
+========================================
+8. NUMBER
+========================================
+Prime numbers:
+Only divisible by 1 and itself
+
+Factors:
+Numbers that divide exactly
+
+Multiples:
+Results of multiplication
+
+Standard form:
+a × 10^n where 1 ≤ a < 10
+
+========================================
+9. SEQUENCES
+========================================
+Arithmetic:
+Common difference
+
+nth term:
+a + (n-1)d
+
+Geometric:
+Common ratio
+
+nth term:
+ar^(n-1)
+
+========================================
+10. VECTORS (BASIC)
+========================================
+Vectors have magnitude and direction.
+
+Column vector:
+(a, b)
+
+Vector addition:
+(a, b) + (c, d) = (a+c, b+d)
+
+========================================
+END OF NOTES
+========================================
