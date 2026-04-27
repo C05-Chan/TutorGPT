@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { localStorageSettingsLoader } from "../utility"
+import { applySettingsOnLoad } from "../src/applySettings"
 
 async function loadSettings(userID, setResponseLength, setDisplayMode, setDisplayTextSize, setDisplayFontStyle) {
     if (userID && userID !== "null") {
@@ -17,13 +18,16 @@ async function loadSettings(userID, setResponseLength, setDisplayMode, setDispla
 }
 
 async function saveUserSettings(userID, responseLength, displayMode, displayTextSize, displayFontStyle) {
+    // Always persist to localStorage so App.jsx can read on next load
+    localStorage.setItem("responseLength",    responseLength)
+    localStorage.setItem("displayMode",       displayMode)
+    localStorage.setItem("displayTextSize",   displayTextSize)
+    localStorage.setItem("displayFontStyle",  displayFontStyle)
+
+    applySettingsOnLoad(displayMode, displayTextSize, displayFontStyle)
+
     if (userID && userID !== "null") {
-        localStorage.setItem("responseLength", responseLength)
-        localStorage.setItem("displayMode", displayMode)
-        localStorage.setItem("displayTextSize", displayTextSize)
-        localStorage.setItem("displayFontStyle", displayFontStyle)
-        console.log("Settings saved to localStorage for non-logged-in user. Response Length:", responseLength, "Display Mode:", displayMode, "Text Size:", displayTextSize, "Font Style:", displayFontStyle)
-    } else { 
+        // Logged-in user: also persist to the server
         const res = await fetch("/api/updateSettings", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -33,15 +37,15 @@ async function saveUserSettings(userID, responseLength, displayMode, displayText
         const data = await res.json()
 
         if (data.success) {
-            console.log("Settings saved successfully.")
-            console.log("Saving settings for userID:", userID, "Response Length:", responseLength, "Display Mode:", displayMode, "Text Size:", displayTextSize, "Font Style:", displayFontStyle)
+            console.log("Settings saved to server for userID:", userID)
             await localStorageSettingsLoader(userID)
-
         } else {
-            console.error("Failed to save settings:", data.message)
+            console.error("Failed to save settings to server:", data.message)
         }
+    } else {
+        console.log("Settings saved to localStorage (guest user).")
     }
-}   
+}
 
 async function handleDeleteAccount(setPage) {
     const userID = localStorage.getItem("userID")

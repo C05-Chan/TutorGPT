@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import "./App.css"
+import { applySettingsOnLoad } from "./applySettings"
 
 // Components
 import TopNavbar from "../components/TopNavbar.jsx"
@@ -16,8 +17,14 @@ import ContinueChat from "../pages/ContinueChat.jsx"
 
 function App() {
   const [page, setPage] = useState("home")
-  // const [message, setMessage] = useState("message")
 
+  // Apply the user's saved visual settings as soon as the app loads
+  useEffect(() => {
+    const displayMode = localStorage.getItem("displayMode") || "Light"
+    const displayTextSize = localStorage.getItem("displayTextSize") || "Medium"
+    const displayFontStyle = localStorage.getItem("displayFontStyle") || "Arial"
+    applySettingsOnLoad(displayMode, displayTextSize, displayFontStyle)
+  }, [])
 
   return (
     <>
@@ -28,9 +35,9 @@ function App() {
       {page === "login" && <Login setPage={setPage} />}
       {page === "signup" && <Signup setPage={setPage} />}
       {page === "resetpwd" && <ResetPassword setPage={setPage} />}
-      {page === "newchatinfo" && <NewChatInfo setPage={setPage} />}
-      {page === "continuechat" && <ContinueChat  />}
-      {page === "newchat" && <NewChat  />}
+      {page === "newchatinfo"  && <NewChatInfo setPage={setPage} />}
+      {page === "continuechat" && <ContinueChat />}
+      {page === "newchat" && <NewChat />}
     </>
   )
 }

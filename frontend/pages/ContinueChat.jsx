@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react"
+import ReactMarkdown from "react-markdown";
+import remarkBreaks from "remark-breaks";
 import ChatPromptBar from "../components/ChatPromptBar"
 import Citations from "../components/Citations"
+import ConfidenceFlag from "../components/ConfidenceFlag"
 
 async function fetchMessages(setMessages) {
     if (localStorage.getItem("userID")) {
@@ -11,7 +14,7 @@ async function fetchMessages(setMessages) {
         const data = await res.json()
         setMessages(data.messages || [])
     } else {
-        const res = await fetch(`/api/retrievemessages?tempChatID=${localStorage.getItem("tempChatID")}`, {
+        const res = await fetch(`/api/retrievemessages?tempChatSessionID=${localStorage.getItem("tempChatSessionID")}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
@@ -32,7 +35,7 @@ async function fetchChatInfo(setChatTitle) {
         console.log(data)
         return data
     } else {
-        const res = await fetch(`/api/retrievetempchatinfo?tempChatID=${localStorage.getItem("tempChatID")}`, {
+        const res = await fetch(`/api/retrievetempchatinfo?tempChatSessionID=${localStorage.getItem("tempChatSessionID")}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
@@ -45,7 +48,6 @@ async function fetchChatInfo(setChatTitle) {
     }
 }
 
-
 async function fetchDocuments(setUploadedDoc) {
     if (!localStorage.getItem("userID")) return
     const chatID = localStorage.getItem("chatSessionID")
@@ -54,10 +56,19 @@ async function fetchDocuments(setUploadedDoc) {
     setUploadedDoc(data.documents[0] || null) 
 }
 
+async function fetchCitations(messageID, setSelectedCitations) {
+    console.log("fetchCitations called with messageID:", messageID)
+    const res = await fetch(`/api/getcitations?messageID=${messageID}`)
+    const data = await res.json()
+    console.log("citations data:", data)
+    setSelectedCitations(data.citations || [])
+}
+
 function ContinueChat() {
     const [chatTitle, setChatTitle] = useState("")
     const [messages, setMessage] = useState([])
     const [uploadedDoc, setUploadedDoc] = useState(null)
+    const [selectedCitations, setSelectedCitations] = useState([])
 
     useEffect(() => {
         fetchChatInfo(setChatTitle)
@@ -70,9 +81,19 @@ function ContinueChat() {
     if (messages.length > 0) {
         for (let i = 0; i < messages.length; i++) {
             messagesList.push(
-                <div key={i} className={messages[i][1] === "User" ? "message-user" : "message-ai"}>
-                    <p>{messages[i][1]}</p>
-                </div>
+            <div key={i} className={messages[i][1] === "User" ? "message-user" : "message-ai"}> 
+                <ReactMarkdown remarkPlugins={[remarkBreaks]}>
+                    {String(messages[i][2] || "")}
+                </ReactMarkdown>
+
+                {messages[i][1] === "TutorGPT" && (
+                    <ConfidenceFlag confidence={messages[i][3]} />
+                )}
+
+                {messages[i][1] === "TutorGPT" && (
+                    <button onClick={() => fetchCitations(messages[i][0], setSelectedCitations)}>Show Sources</button> 
+                )}
+            </div>
             );
         }
     }
@@ -80,7 +101,7 @@ function ContinueChat() {
     if (uploadedDoc) {
         return (
             <div className="new-chat-container">
-                <Citations></Citations>
+                <Citations citations={selectedCitations}/>
                 <h2>{chatTitle}</h2>
                 <p>Refers to this document: <a href={`/api/getfile?chatSessionID=${localStorage.getItem("chatSessionID")}`} download>
     {uploadedDoc[0]} </a> </p>
@@ -91,7 +112,7 @@ function ContinueChat() {
     }
     return (
                 <div className="new-chat-container">
-                    <Citations></Citations>
+                    <Citations citations={selectedCitations} />
                     <h2>{chatTitle}</h2>
                     {messagesList}
                     <ChatPromptBar messages={messages} setMessage={setMessage} />

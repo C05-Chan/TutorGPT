@@ -17,11 +17,10 @@ CREATE TABLE IF NOT EXISTS accountSettings (
     displayFontStyle TEXT NOT NULL DEFAULT 'Arial',
 
     FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE
-
 );
 
 CREATE TABLE IF NOT EXISTS tempChats (
-    tempChatID INTEGER PRIMARY KEY,
+    tempChatSessionID INTEGER PRIMARY KEY,
     tempChatTitle TEXT NOT NULL,
     tempChatSubject TEXT NOT NULL,
     tempChatExplanationLevel TEXT NOT NULL,
@@ -44,17 +43,19 @@ CREATE TABLE IF NOT EXISTS chatSession (
 CREATE TABLE IF NOT EXISTS messages (
     messageID INTEGER PRIMARY KEY,
     chatSessionID INTEGER,
-    tempChatID INTEGER,
+    tempChatSessionID INTEGER,
     sender TEXT NOT NULL,
     messageContent TEXT NOT NULL,
+    messageConfidence TEXT,
+    messageConfidenceReason TEXT,
     messageTime TEXT DEFAULT (DATETIME('now')),
 
     FOREIGN KEY (chatSessionID) REFERENCES chatSession(chatSessionID) ON DELETE CASCADE,
-    FOREIGN KEY (tempChatID) REFERENCES tempChats(tempChatID) ON DELETE CASCADE,
+    FOREIGN KEY (tempChatSessionID) REFERENCES tempChats(tempChatSessionID) ON DELETE CASCADE,
 
     CHECK(sender IN ('User', 'TutorGPT')),
-    CHECK((chatSessionID IS NOT NULL AND tempChatID IS NULL) OR (chatSessionID IS NULL AND tempChatID IS NOT NULL)
-    )
+    CHECK((chatSessionID IS NOT NULL AND tempChatSessionID IS NULL) OR (chatSessionID IS NULL AND tempChatSessionID IS NOT NULL)),
+    CHECK(sender = 'User' OR (sender = 'TutorGPT' AND messageConfidence IS NOT NULL))
 );
 
 CREATE TABLE IF NOT EXISTS uploadedDocuments (
@@ -71,7 +72,7 @@ CREATE TABLE IF NOT EXISTS uploadedDocuments (
 
 CREATE TABLE IF NOT EXISTS citations (
     citationID INTEGER PRIMARY KEY,
-    documentID INTEGER,
+    documentID INTEGER UNIQUE,
     citationSource TEXT NOT NULL,
     citationName TEXT NOT NULL,
     citationText TEXT NOT NULL,
@@ -80,8 +81,7 @@ CREATE TABLE IF NOT EXISTS citations (
     FOREIGN KEY (documentID) REFERENCES uploadedDocuments(documentID) ON DELETE CASCADE,
 
     CHECK (citationSource != 'Uploaded Document' OR documentID IS NOT NULL),
-    CHECK(citationSource IN ('Uploaded Document', 'External Source')),
-    UNIQUE (documentID, citationURL)
+    CHECK(citationSource IN ('Uploaded Document', 'External Source'))
 );
 
 CREATE TABLE IF NOT EXISTS messageCitations (
@@ -97,7 +97,5 @@ INSERT OR IGNORE INTO users (username, email, password) VALUES ('Test User', 'te
 
 INSERT OR IGNORE INTO accountSettings (userID, responseLength, displayMode, displayTextSize, displayFontStyle) VALUES (1, 'Medium', 'Light', 'Medium', 'Arial');
 
-INSERT OR IGNORE INTO chatSession (userID, chatTitle, chatSubject, chatExplanationLevel) VALUES (1, 'Sample Chat', 'Mathematics', 'Advanced');
+INSERT OR IGNORE INTO chatSession (userID, chatTitle, chatSubject, chatExplanationLevel) VALUES (1, 'Sample Advanced Mathematics Chat', 'Mathematics', 'Advanced');
 
-INSERT OR IGNORE INTO messages (chatSessionID, sender, messageContent) VALUES (1, 'User', 'This is user logged example messagge'),
-(1, 'TutorGPT', 'This is system response to logged example message');

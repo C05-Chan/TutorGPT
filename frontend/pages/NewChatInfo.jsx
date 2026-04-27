@@ -41,7 +41,7 @@ async function handleCreate(title, subject, level, setError, setPage, fileSelect
             if (data.success) {
                 setPage("newchat")
                 console.log("Chat created successfully with title:", title, "and subject:", subject, "and level:", level)
-                localStorage.setItem("tempChatID", 1)
+                localStorage.setItem("tempChatSessionID", 1)
             } else {
                 setError(data.message)
                 console.error("Chat creation failed:", data.message)

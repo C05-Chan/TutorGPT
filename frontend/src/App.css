@@ -1,3 +1,41 @@
+/* ── Theme CSS Variables ───────────────────────────────────────── */
+:root {
+  --bg-color: #ffffff;
+  --text-color: #111111;
+  --font-size: 16px;
+  --font-family: Arial, sans-serif;
+}
+
+/* ── Applied to root so every element inherits ─────────────────── */
+
+h1,h2 {
+  color: var(--text-color);
+}
+
+h3, h4, h5, h6 {
+  color: var(--text-color);
+  font-family: var(--font-family);
+  font-size: revert;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-size: var(--font-size);
+  font-family: var(--font-family);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+/* ── Layout ─────────────────────────────────────────────────────── */
 .chat-layout {
   display: flex;
 }
@@ -6,24 +44,15 @@
   flex: 1;
 }
 
-body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-}
-
-#root {
-  height: 100%;
-  width: 100%;
-}
-
+/* ── Navbar ─────────────────────────────────────────────────────── */
 .navbar {
   display: flex;
   align-items: center;
   height: 60px;
   padding: 0 20px;
   box-sizing: border-box;
+  background-color: var(--bg-color);
+  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
 }
 
 .navbar-left {
@@ -43,4 +72,18 @@ body {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+/* ── Confidence flags ───────────────────────────────────────────── */
+.flag-low {
+  color: red;
+}
+
+.flag-high {
+  display: none;
+}
+
+/* ── AI message formatting ──────────────────────────────────────── */
+.message-ai p {
+  white-space: pre-wrap;
 }

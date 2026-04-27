@@ -1,3 +1,4 @@
+import { applySettingsOnLoad } from "./src/applySettings"
 
 export async function localStorageSettingsLoader(userID) {
     const res = await fetch(`/api/userSettings?user_id=${userID}`, {
@@ -12,6 +13,8 @@ export async function localStorageSettingsLoader(userID) {
     localStorage.setItem("displayMode", settings.displayMode)
     localStorage.setItem("displayTextSize", settings.displayTextSize)
     localStorage.setItem("displayFontStyle", settings.displayFontStyle)
+
+    applySettingsOnLoad(settings.displayMode, settings.displayTextSize, settings.displayFontStyle)
 
     return settings;
 }

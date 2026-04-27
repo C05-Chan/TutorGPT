@@ -13,7 +13,7 @@ async function fetchChats() {
 }
 
 async function fetchTempChats() {
-    const res = await fetch(`/api/retrievetempchats?tempChatID=${localStorage.getItem("tempChatID")}`, {
+    const res = await fetch(`/api/retrievetempchats?tempChatSessionID=${localStorage.getItem("tempChatSessionID")}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
@@ -26,7 +26,7 @@ async function fetchTempChats() {
 
 async function loadChats(setChats) {
     console.log("loadChats called")
-    if (!localStorage.getItem("userID") && localStorage.getItem("tempChatID")) {
+    if (!localStorage.getItem("userID") && localStorage.getItem("tempChatSessionID")) {
         const chats = await fetchTempChats();
         console.log("fetched chats:", chats)
         setChats(chats || []);
@@ -46,7 +46,7 @@ async function deleteChat(chatSessionID, setChats) {
         const res = await fetch("/api/deletetempchat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ tempChatID: chatSessionID })
+            body: JSON.stringify({ tempChatSessionID: chatSessionID })
         })
         const data = await res.json()
         if (data.success) {

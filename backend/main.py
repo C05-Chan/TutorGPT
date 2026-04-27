@@ -112,10 +112,10 @@ def get_chat_info(chatSessionID: int):
         return {"error": True, "message": "Chat session not found."}
     
 @app.get("/api/retrievetempchatinfo")
-def get_temp_chat_info(tempChatID: int):
+def get_temp_chat_info(tempChatSessionID: int):
     connection = get_connection()
     cursor = connection.cursor()
-    cursor.execute("SELECT tempChatTitle, tempChatSubject FROM tempChats WHERE tempChatID = ?", (tempChatID,))
+    cursor.execute("SELECT tempChatTitle, tempChatSubject FROM tempChats WHERE tempChatSessionID = ?", (tempChatSessionID,))
     chat_info = cursor.fetchone()
     connection.close()
 
@@ -125,14 +125,14 @@ def get_temp_chat_info(tempChatID: int):
         return {"error": True, "message": "Temporary chat not found."}
     
 @app.get("/api/retrievemessages")
-def get_messages(chatSessionID: int = None, tempChatID: int = None):
+def get_messages(chatSessionID: int = None, tempChatSessionID: int = None):
     connection = get_connection()
     cursor = connection.cursor()
     
     if chatSessionID:
-        cursor.execute("SELECT sender, messageContent FROM messages WHERE chatSessionID = ?", (chatSessionID,))
-    elif tempChatID:
-        cursor.execute("SELECT sender, messageContent FROM messages WHERE tempChatID = ?", (tempChatID,))
+        cursor.execute("SELECT messageID, sender, messageContent, messageConfidence FROM messages WHERE chatSessionID = ?", (chatSessionID,))
+    elif tempChatSessionID:
+        cursor.execute("SELECT messageID, sender, messageContent, messageConfidence FROM messages WHERE tempChatSessionID = ?", (tempChatSessionID,))
     else:
         return {"error": True, "message": "No chat session or temporary chat specified."}
     
@@ -142,10 +142,10 @@ def get_messages(chatSessionID: int = None, tempChatID: int = None):
     return {"messages": messages}
 
 @app.get("/api/retrievetempchats")
-def get_temp_chats(tempChatID: int):
+def get_temp_chats(tempChatSessionID: int):
     connection = get_connection()
     cursor = connection.cursor()
-    cursor.execute("SELECT tempChatID, tempChatTitle FROM tempChats WHERE tempChatID = ?", (tempChatID,))
+    cursor.execute("SELECT tempChatSessionID, tempChatTitle FROM tempChats WHERE tempChatSessionID = ?", (tempChatSessionID,))
     temp_chats = cursor.fetchall()
     connection.close()
 
@@ -191,13 +191,13 @@ def create_temp_chat(data: dict = Body(...)):
 
     connection = get_connection()
     cursor = connection.cursor()
-    # cursor.execute("DELETE FROM messages WHERE tempChatID IS NOT NULL")
+    # cursor.execute("DELETE FROM messages WHERE tempChatSessionID IS NOT NULL")
     cursor.execute("DELETE FROM tempChats") 
     cursor.execute("INSERT INTO tempChats (tempChatTitle, tempChatSubject, tempChatExplanationLevel) VALUES (?, ?, ?)", (temp_chat_title, temp_chat_subject, temp_chat_level))
     connection.commit()
     connection.close()
 
-    return {"success": True, "tempChatID": 1, "message": "Temporary chat created successfully."}
+    return {"success": True, "tempChatSessionID": 1, "message": "Temporary chat created successfully."}
 
 @app.post("/api/createchat")
 def new_chat(data: dict = Body(...)):
@@ -224,6 +224,10 @@ def new_chat(data: dict = Body(...)):
 def submit_logged_prompt(data: dict = Body(...)):
     prompt = data["prompt"]
     chatSessionID = data["chatSessionID"]
+    confidence = ""
+    confidence_reason = ""
+    citations = []
+
 
     connection = get_connection()
     cursor = connection.cursor()
@@ -238,49 +242,92 @@ def submit_logged_prompt(data: dict = Body(...)):
     subject = chat_info[0]
     level = chat_info[1]
     
-    cursor.execute("""
-        SELECT as2.responseLength FROM accountSettings as2
-        JOIN chatSession cs ON cs.userID = as2.userID
-        WHERE cs.chatSessionID = ?
-    """, (chatSessionID,))
+    cursor.execute("SELECT as2.responseLength FROM accountSettings as2 JOIN chatSession cs ON cs.userID = as2.userID WHERE cs.chatSessionID = ?", (chatSessionID,))
     settings = cursor.fetchone()
     response_length = settings[0] if settings else "Medium"
 
-    cursor.execute("SELECT filePath FROM uploadedDocuments WHERE chatSessionID = ?", (chatSessionID,))
+    cursor.execute("SELECT filePath, fileName FROM uploadedDocuments WHERE chatSessionID = ?", (chatSessionID,))
     file = cursor.fetchone()
 
     if file:
         with open(file[0], "r") as f:
             document_context = f.read()
-        full_prompt = f"""Use this document as context:\n{document_context}\n\nUser question: {prompt}"""
+            
+        full_prompt = f"""Use this document as context (document name: {file[1]}):
+        {document_context}
+
+        User question: {prompt}, and cite 1 or more relevant source."""
     else:
-        full_prompt = prompt
+        full_prompt = f"{prompt} , and cite 1 or more relevant sources."
 
     ai_response = call_ai(full_prompt, subject=subject, level=level, response_length=response_length)
 
     try:
         parsed = json.loads(ai_response)
         message_text = parsed.get("response", ai_response)
-    except Exception:
+        confidence = parsed.get("confidence", "")
+        confidence_reason = parsed.get("confidence_reason", "")
+        citations = parsed.get("citations", [])
+    except Exception as e:
+        print(f"[JSON PARSE ERROR]: {e}")
         message_text = ai_response
 
     cursor.execute("INSERT INTO messages (chatSessionID, sender, messageContent) VALUES (?, ?, ?)", (chatSessionID, "User", prompt))
-    cursor.execute("INSERT INTO messages (chatSessionID, sender, messageContent) VALUES (?, ?, ?)", (chatSessionID, "TutorGPT", message_text))
+    cursor.execute("INSERT INTO messages (chatSessionID, sender, messageContent, messageConfidence, messageConfidenceReason) VALUES (?, ?, ?, ?, ?)", 
+    (chatSessionID, "TutorGPT", message_text, confidence, confidence_reason))
+
+    cursor.execute("SELECT messageID FROM messages WHERE chatSessionID = ? AND sender = 'TutorGPT' ORDER BY messageTime DESC LIMIT 1", (chatSessionID,))
+    message_id = cursor.fetchone()[0]
+    
+    print("citations", citations)
+    for c in citations:
+        
+        source = c["source"].strip().lower()
+        if source == "external" or source == "external source":
+            source = "External Source"
+        elif source == "document" or source == "uploaded document" or source == 'uploaded':
+            continue
+            
+        cursor.execute("INSERT OR IGNORE INTO citations (citationSource, citationName, citationText, citationURL) VALUES (?, ?, ?, ?)",
+            (source, c["name"], c["text"], c["url"]))
+        cursor.execute("SELECT citationID FROM citations WHERE citationURL = ? AND citationName = ?", (c["url"], c["name"]))
+        result = cursor.fetchone()
+        
+        if result is None:
+            continue
+        
+        citation_id = result[0]
+        cursor.execute("INSERT OR IGNORE INTO messageCitations (messageID, citationID) VALUES (?, ?)", (message_id, citation_id))
+        
+        
+    if file:
+        cursor.execute("SELECT documentID FROM uploadedDocuments WHERE chatSessionID = ?", (chatSessionID,))
+        doc = cursor.fetchone()
+        if doc:
+            cursor.execute("INSERT OR IGNORE INTO citations (documentID, citationSource, citationName, citationText, citationURL) VALUES (?, ?, ?, ?, ?)",
+    (doc[0], "Uploaded Document", file[1], "Referenced document", file[0]))
+            cursor.execute("SELECT citationID FROM citations WHERE documentID = ?", (doc[0],))
+            citation_id = cursor.fetchone()[0]
+            cursor.execute("INSERT OR IGNORE INTO messageCitations (messageID, citationID) VALUES (?, ?)", (message_id, citation_id))
+
     connection.commit()
     connection.close()
 
-    return {"success": True, "message": message_text}
+    return {"success": True, "message": message_text, "confidence": confidence, "messageID": message_id}
 
 
 @app.post("/api/submitunloggedprompt")
 def submit_unlogged_prompt(data: dict = Body(...)):
     prompt = data["prompt"]
-    tempChatID = data["tempChatID"]
+    tempChatSessionID = data["tempChatSessionID"]
+    confidence = ""
+    confidence_reason = ""
+    citations = []
 
     connection = get_connection()
     cursor = connection.cursor()
 
-    cursor.execute("SELECT tempChatSubject, tempChatExplanationLevel FROM tempChats WHERE tempChatID = ?", (tempChatID,))
+    cursor.execute("SELECT tempChatSubject, tempChatExplanationLevel FROM tempChats WHERE tempChatSessionID = ?", (tempChatSessionID,))
     chat_info = cursor.fetchone()
     
     if chat_info is None:
@@ -289,21 +336,52 @@ def submit_unlogged_prompt(data: dict = Body(...)):
 
     subject = chat_info[0]
     level = chat_info[1]
+    
+    full_prompt = f"{prompt}, and cite at least 1 source."
 
-    ai_response = call_ai(prompt, subject=subject, level=level)
+    ai_response = call_ai(full_prompt, subject=subject, level=level)
 
     try:
         parsed = json.loads(ai_response)
         message_text = parsed.get("response", ai_response)
-    except Exception:
+        confidence = parsed.get("confidence", "")
+        confidence_reason = parsed.get("confidence_reason", "")
+        citations = parsed.get("citations", [])
+    except Exception as e:
+        print(f"[JSON PARSE ERROR]: {e}")
         message_text = ai_response
 
-    cursor.execute("INSERT INTO messages (tempChatID, sender, messageContent) VALUES (?, ?, ?)", (tempChatID, "User", prompt))
-    cursor.execute("INSERT INTO messages (tempChatID, sender, messageContent) VALUES (?, ?, ?)", (tempChatID, "TutorGPT", message_text))
+    cursor.execute("INSERT INTO messages (tempChatSessionID, sender, messageContent) VALUES (?, ?, ?)", (tempChatSessionID, "User", prompt))
+    cursor.execute("INSERT INTO messages (tempChatSessionID, sender, messageContent, messageConfidence, messageConfidenceReason) VALUES (?, ?, ?, ?, ?)", 
+    (tempChatSessionID, "TutorGPT", message_text, confidence, confidence_reason))
+
+    cursor.execute("SELECT messageID FROM messages WHERE tempChatSessionID = ? AND sender = 'TutorGPT' ORDER BY messageTime DESC LIMIT 1", (tempChatSessionID,))
+    message_id = cursor.fetchone()[0]
+    
+        
+    print("citations", citations)
+    
+    for c in citations:
+        
+        source = c["source"].strip().lower()
+        if source == "external" or source == "external source":
+            source = "External Source"
+            
+        cursor.execute("INSERT OR IGNORE INTO citations (citationSource, citationName, citationText, citationURL) VALUES (?, ?, ?, ?)",
+            (source, c["name"], c["text"], c["url"]))
+        cursor.execute("SELECT citationID FROM citations WHERE citationURL = ? AND citationName = ?", (c["url"], c["name"]))
+        result = cursor.fetchone()
+        
+        if result is None:
+            continue
+        
+        citation_id = result[0]
+        cursor.execute("INSERT OR IGNORE INTO messageCitations (messageID, citationID) VALUES (?, ?)", (message_id, citation_id))
+        
     connection.commit()
     connection.close()
 
-    return {"success": True, "message": message_text}
+    return {"success": True, "message": message_text, "confidence": confidence, "messageID": message_id}
 
 @app.post("/api/uploaddocument")
 async def upload_document(file: UploadFile = File(...), chatSessionID: int = Form(...)):
@@ -330,7 +408,9 @@ async def upload_document(file: UploadFile = File(...), chatSessionID: int = For
 def get_documents(chatSessionID: int):
     connection = get_connection()
     cursor = connection.cursor()
+    
     cursor.execute("SELECT fileName, fileType, filePath FROM uploadedDocuments WHERE chatSessionID = ?", (chatSessionID,))
+    
     documents = cursor.fetchall()
     connection.close()
 
@@ -353,6 +433,7 @@ def get_file(chatSessionID: int):
 @app.post("/api/deleteaccount")
 def delete_account(data: dict = Body(...)):
     userID = data["userID"]
+    
     connection = get_connection()
     cursor = connection.cursor()
     cursor.execute("DELETE FROM users WHERE userID = ?", (userID,))
@@ -364,19 +445,34 @@ def delete_account(data: dict = Body(...)):
 @app.post("/api/deletechat")
 def delete_chat(data: dict = Body(...)):
     chatSessionID = data["chatSessionID"]
+    
     connection = get_connection()
     cursor = connection.cursor()
+    
     cursor.execute("DELETE FROM chatSession WHERE chatSessionID = ?", (chatSessionID,))
+    
     connection.commit()
     connection.close()
     return {"success": True}
 
 @app.post("/api/deletetempchat")
 def delete_temp_chat(data: dict = Body(...)):
-    tempChatID = data["tempChatID"]
+    tempChatSessionID = data["tempChatSessionID"]
     connection = get_connection()
     cursor = connection.cursor()
-    cursor.execute("DELETE FROM tempChats WHERE tempChatID = ?", (tempChatID,))
+    cursor.execute("DELETE FROM tempChats WHERE tempChatSessionID = ?", (tempChatSessionID,))
     connection.commit()
     connection.close()
     return {"success": True}
+
+@app.get("/api/getcitations")
+def get_citations(messageID: int):
+    connection = get_connection()
+    cursor = connection.cursor()
+    
+    cursor.execute("SELECT c.citationName, c.citationText, c.citationSource, c.citationURL FROM citations c JOIN messageCitations mc ON mc.citationID = c.citationID WHERE mc.messageID = ?", (messageID,))
+    
+    citations = cursor.fetchall()
+    connection.close()
+    
+    return {"citations": citations}
