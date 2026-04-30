@@ -2,6 +2,7 @@ from fastapi import FastAPI, Body, UploadFile, File, Form, staticfiles
 from fastapi.responses import FileResponse
 from database import init_db, get_connection
 from dotenv import load_dotenv
+import bcrypt
 from aiservice import call_ai
 import json
 
@@ -15,11 +16,13 @@ init_db()
 def login(email: str = Body(...), password: str = Body(...)):
     connection = get_connection()
     cursor = connection.cursor()
-    cursor.execute("SELECT userID FROM users WHERE email = ? AND password = ?", (email, password))
+    
+    cursor.execute("SELECT userID, password FROM users WHERE email = ?", (email,))
+    
     result = cursor.fetchone()
     connection.close()
 
-    if result:
+    if result and bcrypt.checkpw(password.encode("utf-8"), result[1]):
         return {"success": True, "userID": result[0]}
     else:
         return {"error": True, "message": "Invalid Email or Password. Please Try Again."}
@@ -28,8 +31,10 @@ def login(email: str = Body(...), password: str = Body(...)):
 @app.get("/api/emailcheck")
 def email_check(email: str):
     email = email.lower()
+    
     connection = get_connection()
     cursor = connection.cursor()
+    
     cursor.execute("SELECT email FROM users WHERE email = ?", (email,))
     
     result = cursor.fetchone()
@@ -43,9 +48,12 @@ def email_check(email: str):
 @app.get("/api/userinfo")
 def get_user(email: str):
     email = email.lower()
+    
     connection = get_connection()
     cursor = connection.cursor()
+    
     cursor.execute("SELECT userID, username FROM users WHERE email = ?", (email,))
+    
     result = cursor.fetchone()
     connection.close()
 
@@ -63,7 +71,10 @@ def signup(data: dict = Body(...)):
     
     connection = get_connection()
     cursor = connection.cursor()
-    cursor.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", (username, email, password))
+    
+    hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+    
+    cursor.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", (username, email, hashed_password))
     cursor.execute("SELECT userID FROM users WHERE email = ?", (email,))
     
     user_id = cursor.fetchone()[0]
@@ -79,9 +90,11 @@ def reset_password(data: dict = Body(...)):
     new_password = data["password"]
     email = data["email"].lower()
 
+    hashed_password = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt())
+
     connection = get_connection()
     cursor = connection.cursor()
-    cursor.execute("UPDATE users SET password = ? WHERE email = ?", (new_password, email))
+    cursor.execute("UPDATE users SET password = ? WHERE email = ?", (hashed_password, email))
     
     connection.commit()
     connection.close()
@@ -92,7 +105,9 @@ def reset_password(data: dict = Body(...)):
 def get_chats(user_id: int):
     connection = get_connection()
     cursor = connection.cursor()
+    
     cursor.execute("SELECT chatSessionID, chatTitle FROM chatSession WHERE userID = ?", (user_id,))
+    
     chats = cursor.fetchall()
     connection.close()
 
@@ -102,7 +117,9 @@ def get_chats(user_id: int):
 def get_chat_info(chatSessionID: int):
     connection = get_connection()
     cursor = connection.cursor()
+    
     cursor.execute("SELECT chatTitle, chatSubject FROM chatSession WHERE chatSessionID = ?", (chatSessionID,))
+    
     chat_info = cursor.fetchone()
     connection.close()
 
@@ -115,7 +132,9 @@ def get_chat_info(chatSessionID: int):
 def get_temp_chat_info(tempChatSessionID: int):
     connection = get_connection()
     cursor = connection.cursor()
+    
     cursor.execute("SELECT tempChatTitle, tempChatSubject FROM tempChats WHERE tempChatSessionID = ?", (tempChatSessionID,))
+    
     chat_info = cursor.fetchone()
     connection.close()
 
@@ -256,9 +275,9 @@ def submit_logged_prompt(data: dict = Body(...)):
         full_prompt = f"""Use this document as context (document name: {file[1]}):
         {document_context}
 
-        User question: {prompt}, and cite 1 or more relevant source."""
+        User question:{prompt}, and cite 1 or more relevant source [Remember: never give complete answers]."""
     else:
-        full_prompt = f"{prompt} , and cite 1 or more relevant sources."
+        full_prompt = f"{prompt} , and cite 1 or more relevant sources [Remember: never give complete answers]."
 
     ai_response = call_ai(full_prompt, subject=subject, level=level, response_length=response_length)
 

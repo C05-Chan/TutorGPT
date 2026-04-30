@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { TrashIcon }from "../components/Icons.jsx";
 
 async function fetchChats() {
     const res = await fetch(`/api/retrievechats?user_id=${localStorage.getItem("userID")}`, {
@@ -79,18 +80,24 @@ function Home({ setPage }) {
         const chatLists = [];
         for (let i = 0; i < chats.length; i++) {
             chatLists.push(
-                <div key={i} className="chat-item">
-                    <button className="btn-selections" 
+                <div key={i} className="home-card home-card--chat">
+
+                    <button className="home-card__body" 
                         onClick={() => {
                             localStorage.setItem("chatSessionID", chats[i][0]);
                             setPage("continuechat");
                         }}>
-                        Continue Chat: {chats[i][1]}
+                        <span className="home-card__title">Continue Chat: {chats[i][1]}</span>
                     </button>
-                    <button 
-                    onClick={() => {
-                        console.log("delete clicked", chats[i][0]) 
-                        deleteChat(chats[i][0], setChats)}}>Delete</button>
+
+                    <button className="home-card__delete"
+                        onClick={() => {
+                            console.log("delete clicked", chats[i][0]) 
+                            deleteChat(chats[i][0], setChats)
+                        }}>
+                        <TrashIcon/>
+                    </button>
+
                 </div>
             );
         }
@@ -98,29 +105,49 @@ function Home({ setPage }) {
         console.log("chatLists:", chatLists)
 
         if (localStorage.getItem("username")) {
+            const username = localStorage.getItem("username")
             return (
-                <div>
-                    <h2>Welcombe back {localStorage.getItem("username")}!</h2>
-                    <button className="btn-selections" onClick={() => setPage("newchatinfo")}>+</button>
-                    {chatLists}
+                <div className="home-container">
+                    <h2 className="home-title">Welcome back, {username}!</h2>
+                    <div className="home-grid">
+                        <button className="home-card home-card--new" 
+                            onClick={() => 
+                                setPage("newchatinfo")
+                            }>
+                            <span className="home-card__new">+</span>
+                        </button>
+                        {chatLists}
+                    </div>
                 </div>
             );
         } else {
             return (
-                <div>
-                    <h2>Welcome back!</h2>
-                    <button className="btn-selections" onClick={() => setPage("newchatinfo")}>+</button>
-                    {chatLists}
+                <div className="home-container">
+                    <div className="home-grid">
+                        <button className="home-card home-card--new" 
+                            onClick={() => 
+                                setPage("newchatinfo")
+                            }>
+                            <span className="home-card__new">+</span>
+                        </button>
+                        {chatLists}
+                    </div>
                 </div>
             );
         }
     }
 
     return (
-    <div>
-        <h2>Start a Conversation!</h2>
-        <button className="btn-selections" onClick={() => setPage("newchatinfo")}>+</button>
-    </div>
+        <div className="home-container">
+            <div className="home-grid">
+                <button className="home-card home-card--new" 
+                    onClick={() => 
+                        setPage("newchatinfo")
+                    }>
+                    <span className="home-card__new">+</span>
+                </button>
+            </div>
+        </div>
     );
 }
 

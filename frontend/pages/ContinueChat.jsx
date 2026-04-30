@@ -51,17 +51,29 @@ async function fetchChatInfo(setChatTitle) {
 async function fetchDocuments(setUploadedDoc) {
     if (!localStorage.getItem("userID")) return
     const chatID = localStorage.getItem("chatSessionID")
-    const res = await fetch(`/api/getdocument?chatSessionID=${chatID}`)
+    const res = await fetch(`/api/getdocument?chatSessionID=${chatID}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+    })
+
     const data = await res.json()
     setUploadedDoc(data.documents[0] || null) 
 }
 
 async function fetchCitations(messageID, setSelectedCitations) {
     console.log("fetchCitations called with messageID:", messageID)
-    const res = await fetch(`/api/getcitations?messageID=${messageID}`)
+    const res = await fetch(`/api/getcitations?messageID=${messageID}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+    })
     const data = await res.json()
+
+    if (!data.citations || data.citations.length === 0) {
+        setSelectedCitations(["empty"])  // special flag
+    } else {
+        setSelectedCitations(data.citations)
+    }
     console.log("citations data:", data)
-    setSelectedCitations(data.citations || [])
 }
 
 function ContinueChat() {
@@ -77,47 +89,75 @@ function ContinueChat() {
 
     }, [])
 
-    let messagesList = [];
-    if (messages.length > 0) {
-        for (let i = 0; i < messages.length; i++) {
+    const pairs = []
+    for (let i = 0; i < messages.length; i += 2) {
+        pairs.push([messages[i], messages[i + 1]])
+    }
+
+    pairs.reverse()
+
+    let messagesList = []
+    for (let i = 0; i < pairs.length; i++) {
+        const userMsg = pairs[i][0]
+        const aiMsg = pairs[i][1]
+
+        if (userMsg) {
             messagesList.push(
-            <div key={i} className={messages[i][1] === "User" ? "message-user" : "message-ai"}> 
-                <ReactMarkdown remarkPlugins={[remarkBreaks]}>
-                    {String(messages[i][2] || "")}
-                </ReactMarkdown>
+                <div key={`user-${i}`} className="message-user">
+                    <ReactMarkdown remarkPlugins={[remarkBreaks]}>
+                        {String(userMsg[2] || "")}
+                    </ReactMarkdown>
+                </div>
+            )
+        }
 
-                {messages[i][1] === "TutorGPT" && (
-                    <ConfidenceFlag confidence={messages[i][3]} />
-                )}
+        if (aiMsg) {
+            messagesList.push(
+                <div key={`ai-${i}`} className="message-ai">
+                    <ReactMarkdown remarkPlugins={[remarkBreaks]}>
+                        {String(aiMsg[2] || "")}
+                    </ReactMarkdown>
 
-                {messages[i][1] === "TutorGPT" && (
-                    <button onClick={() => fetchCitations(messages[i][0], setSelectedCitations)}>Show Sources</button> 
-                )}
-            </div>
-            );
+                    <ConfidenceFlag confidence={aiMsg[3]} />
+                    <button onClick={() => fetchCitations(aiMsg[0], setSelectedCitations)}>Show Sources</button>
+                </div>
+            )
         }
     }
 
     if (uploadedDoc) {
         return (
-            <div className="new-chat-container">
-                <Citations citations={selectedCitations}/>
-                <h2>{chatTitle}</h2>
-                <p>Refers to this document: <a href={`/api/getfile?chatSessionID=${localStorage.getItem("chatSessionID")}`} download>
-    {uploadedDoc[0]} </a> </p>
-                {messagesList}
-                <ChatPromptBar messages={messages} setMessage={setMessage} />
+            <div className="chat-layout">
+                <div className="chat-sidebar">
+                    <Citations citations={selectedCitations} />
+                </div>
+    
+                <div className="chat-main">
+                    <h2>{chatTitle}</h2>
+                    <p>Refers to this document: <a href={`/api/getfile chatSessionID=${localStorage.getItem("chatSessionID")}`} download>
+                        {uploadedDoc[0]}
+                    </a></p>
+            
+                    <ChatPromptBar messages={messages} setMessage={setMessage} />
+                    {messagesList}
+                </div>
             </div>
         )
     }
     return (
-                <div className="new-chat-container">
-                    <Citations citations={selectedCitations} />
-                    <h2>{chatTitle}</h2>
-                    {messagesList}
-                    <ChatPromptBar messages={messages} setMessage={setMessage} />
+        <div className="chat-layout">
+            <div className="chat-sidebar">
+                <Citations citations={selectedCitations} />
+            </div>
+    
+            <div className="chat-main">
+                <h2>{chatTitle}</h2>
+                
+                <ChatPromptBar messages={messages} setMessage={setMessage} />
+                {messagesList}
                 </div>
-            )
+            </div>
+        )
     }
 
 export default ContinueChat

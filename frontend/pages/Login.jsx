@@ -36,28 +36,34 @@ function Login({ setPage }) {
 
 
     return (
-    <>
-        <div className="login-form">
+        <div className="login-container">
+            <h2>Login</h2>
+
             {error && <ErrorPopup message={error} />}
-            <label>Email: </label>
-            <input onChange={(event) => setEmail(event.target.value)} />
-            <label>Password: </label>
-            <input onChange={(event) => setPassword(event.target.value)} />
+
+            <div className="login-feature">
+                <label>Email:</label>
+                <input onChange={(event) => setEmail(event.target.value)} />
+            </div>
+
+            <div className="login-feature">
+                <label>Password:</label>
+                <input type="password" onChange={(event) => setPassword(event.target.value)} />
+            </div>
+
             <button onClick={() => handleLogin(email, password, setError, setPage)}>Login</button>
 
-        </div>
+            <div className="login-feature">
+                <p>Don't have an account?</p>
+                <button onClick={() => setPage("signup")}>Sign Up</button>
+            </div>
 
-        <div className="signup-link">
-            <p>Don't have an account?</p> 
-            <button onClick={() => setPage("signup")}>Sign Up</button>
+            <div className="login-feature">
+                <p>Forgotten Password?</p>
+                <button onClick={() => setPage("resetpwd")}>Reset Password</button>
+            </div>
         </div>
-
-        <div className="resetPwd-link">
-            <p>Forgotten Password?</p>
-            <button onClick={() => setPage("resetpwd")}>Reset Password</button>
-        </div>
-    </>
-)
+    )
 }
 
 export default Login

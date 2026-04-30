@@ -1,6 +1,6 @@
 export default function ErrorPopup({ message }) {
   return (
-    <div className="error">
+    <div className="errorMessage">
       <p>{message}</p>
     </div>
   )

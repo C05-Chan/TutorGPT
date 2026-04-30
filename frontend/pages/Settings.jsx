@@ -95,28 +95,40 @@ function Settings({setPage}) {
         <div className="settings-container">
             <h2>Settings Page</h2>
 
-            <select onChange={(e) => setResponseLength(e.target.value)} value={responseLength}>
-                <option value="Short">Short</option>
-                <option value="Medium">Medium</option>
-                <option value="Long">Long</option>
-            </select>
+            <div className="settings-feature">
+                <label>Response Length:</label>
+                <select onChange={(e) => setResponseLength(e.target.value)} value={responseLength}>
+                    <option value="Short">Short</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Long">Long</option>
+                </select>
+            </div>
 
-            <select onChange={(e) => setDisplayMode(e.target.value)} value={displayMode}>
-                <option value="Light">Light Mode</option>
-                <option value="Dark">Dark Mode</option>
-            </select>
+            <div className="settings-feature">
+                <label>System Display Mode:</label>
+                <select onChange={(e) => setDisplayMode(e.target.value)} value={displayMode}>
+                    <option value="Light">Light Mode</option>
+                    <option value="Dark">Dark Mode</option>
+                </select>
+            </div>
 
-            <select onChange={(e) => setDisplayTextSize(e.target.value)} value={displayTextSize}>
-                <option value="Small">Small</option>
-                <option value="Medium">Medium</option>
-                <option value="Large">Large</option>
-            </select>
+            <div className="settings-feature">
+                <label>Text Size:</label>
+                <select onChange={(e) => setDisplayTextSize(e.target.value)} value={displayTextSize}>
+                    <option value="Small">Small</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Large">Large</option>
+                </select>
+            </div>
 
-            <select onChange={(e) => setDisplayFontStyle(e.target.value)} value={displayFontStyle}>
-                <option value="Arial">Arial</option>
-                <option value="Times New Roman">Times New Roman</option>
-                <option value="Courier New">Courier New</option>
-            </select>
+            <div className="settings-feature">
+                <label>Text Font: </label>
+                <select onChange={(e) => setDisplayFontStyle(e.target.value)} value={displayFontStyle}>
+                    <option value="Arial">Arial</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Courier New">Courier New</option>
+                </select>
+            </div>
 
             <button onClick={() => saveUserSettings(userID ?? 'null', responseLength, displayMode, displayTextSize, displayFontStyle)}>Save Settings</button>
             {userID && <button onClick={() => handleDeleteAccount(setPage)}>Deactivate Account</button>}

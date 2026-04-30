@@ -53,6 +53,7 @@ async function handleSignup(username, email, password, confirmPassword, setError
     }
 
     const emailSignUp = email.toLowerCase()
+
     const res = await fetch("/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -71,7 +72,6 @@ async function handleSignup(username, email, password, confirmPassword, setError
     }
 }
 
-
 function Signup({ setPage }) {
     const [username, setUsername] = useState("")
     const [email, setEmail] = useState("")
@@ -80,26 +80,39 @@ function Signup({ setPage }) {
     const [error, setError] = useState("")
 
     return (
-    <>
-        <div className="signup-form">
-            {error && <ErrorPopup message={error} />}
-            <label>Username: </label>
-            <input onChange={(event) => setUsername(event.target.value)} />
-            <label>Email: </label>
-            <input onChange={(event) => setEmail(event.target.value)} />
-            <label>Password: </label>
-            <input onChange={(event) => setPassword(event.target.value)} />
-            <label>Confirm Password: </label>
-            <input onChange={(event) => setConfirmPassword(event.target.value)} />
-            <button onClick={() => handleSignup(username, email, password, confirmPassword, setError, setPage)}>Sign Up</button>
-        </div>
+        <div className="signup-container">
+            <h2>Sign Up</h2>
 
-        <div className="login-link">
-            <p>Already have an account?</p> 
-            <button onClick={() => setPage("login")}>Login!</button>
+            {error && <ErrorPopup message={error} />}
+
+            <div className="signup-feature">
+                <label>Username: </label>
+                <input onChange={(event) => setUsername(event.target.value)} />
+            </div>
+
+            <div className="signup-feature">
+                <label>Email: </label>
+                <input onChange={(event) => setEmail(event.target.value)} />
+            </div>
+
+            <div className="signup-feature">
+                <label>Password: </label>
+                <input type="password" onChange={(event) => setPassword(event.target.value)} />
+            </div>
+
+            <div className="signup-feature">
+                <label>Confirm Password: </label>
+                <input type="password" onChange={(event) => setConfirmPassword(event.target.value)} />
+            </div>
+
+            <button onClick={() => handleSignup(username, email, password, confirmPassword, setError, setPage)}>Sign Up</button>
+
+            <div className="signup-feature">
+                <p>Already have an account?</p>
+                <button onClick={() => setPage("login")}>Login</button>
+            </div>
         </div>
-    </>
-)
+    )
 }
 
 export default Signup

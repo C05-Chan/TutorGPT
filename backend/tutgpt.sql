@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS messageCitations (
     FOREIGN KEY (citationID) REFERENCES citations(citationID) ON DELETE CASCADE
 );
 
-INSERT OR IGNORE INTO users (username, email, password) VALUES ('Test User', 'testuser@example.com', 'password123');
+INSERT OR IGNORE INTO users (username, email, password) VALUES ('Test User', 'testuser@fakemail.com', '$2b$12$sdlVsjPPhgXU5GjFrzCx4OWe6xx5TYoIa9UbxrF93lM82g2.QhxwC');
 
 INSERT OR IGNORE INTO accountSettings (userID, responseLength, displayMode, displayTextSize, displayFontStyle) VALUES (1, 'Medium', 'Light', 'Medium', 'Arial');
 

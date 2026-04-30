@@ -3,7 +3,7 @@ export function applySettingsOnLoad(displayMode, displayTextSize, displayFontSty
     
     // ── Dark / Light mode ────────────────────────────────────────────
     if (displayMode === "Dark") {
-        root.style.setProperty("--bg-color", "#111111");
+        root.style.setProperty("--bg-color", "#3B3B3B");
         root.style.setProperty("--text-color", "#ffffff");
     } else {
         root.style.setProperty("--bg-color", "#ffffff");

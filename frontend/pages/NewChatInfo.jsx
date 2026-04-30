@@ -80,58 +80,79 @@ function NewChatInfo({setPage}) {
     const [error, setError] = useState("")
     const [fileSelected, setFileSelected] = useState(null)
 
-    if (localStorage.getItem("userID"))
+    if (localStorage.getItem("userID")) {
         return (
-            <div className="new-chat-form">
+            <div className="chat-info-container">
+                <h2>New Chat</h2>
+
                 {error && <ErrorPopup message={error} />}
-                <label>Title: </label>
-                <input onChange={(event) => setTitle(event.target.value)} />
-                <label> Subject: </label>
-                <select onChange={(event) => setSubject(event.target.value)} value={subject}>
-                    <option value="Computer Science">Computer Science</option>
-                    <option value="Mathematics">Mathematics</option>
-                </select>
 
-                <label>Explanation Level: </label>
-                <select onChange={(event) => setExplanationLevel(event.target.value)}  value={level}>
-                    <option value="Beginner">Beginner</option>
-                    <option value="Intermediate">Intermediate</option>
-                    <option value="Advanced">Advanced</option>
-                    <option value="Expert">Expert</option>
-                </select>
+                <div className="chat-info-feature">
+                    <label>Title</label>
+                    <input onChange={(event) => setTitle(event.target.value)} />
+                </div>
 
-                <label>Add a File: </label>
-                <FileUploader fileSelected={fileSelected} setFileSelected={setFileSelected} setError={setError}/>
+                <div className="chat-info-feature">
+                    <label>Subject</label>
+                    <select onChange={(event) => setSubject(event.target.value)} value={subject}>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Mathematics">Mathematics</option>
+                    </select>
+                </div>
 
+                <div className="chat-info-feature">
+                    <label>Explanation Level</label>
+                    <select onChange={(event) => setExplanationLevel(event.target.value)} value={level}>
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                        <option value="Expert">Expert</option>
+                    </select>
+                </div>
+
+                <div className="chat-info-feature">
+                    <label>Add a File</label>
+                    <FileUploader fileSelected={fileSelected} setFileSelected={setFileSelected} setError={setError} />
+                </div>
 
                 <button onClick={() => handleCreate(title, subject, level, setError, setPage, fileSelected)}>Create Chat</button>
             </div>
         )
-    
-return (
-            <div className="new-chat-form">
-                {error && <ErrorPopup message={error} />}
-                <label>Title: </label>
+    }
+
+    return (
+        <div className="chat-info-container">
+            <h2>New Chat</h2>
+
+            {error && <ErrorPopup message={error} />}
+
+            <div className="chat-info-feature">
+                <label>Title:</label>
                 <input onChange={(event) => setTitle(event.target.value)} />
-                <label> Subject: </label>
+            </div>
+
+            <div className="chat-info-feature">
+                <label>Subject:</label>
                 <select onChange={(event) => setSubject(event.target.value)} value={subject}>
                     <option value="Computer Science">Computer Science</option>
                     <option value="Mathematics">Mathematics</option>
                 </select>
+            </div>
 
-                <label>Explanation Level: </label>
-                <select onChange={(event) => setExplanationLevel(event.target.value)}  value={level}>
+            <div className="chat-info-feature">
+                <label>Explanation Level:</label>
+                <select onChange={(event) => setExplanationLevel(event.target.value)} value={level}>
                     <option value="Beginner">Beginner</option>
                     <option value="Intermediate">Intermediate</option>
                     <option value="Advanced">Advanced</option>
                     <option value="Expert">Expert</option>
                 </select>
-
-                <button onClick={() => handleCreate(title, subject, level, setError, setPage)}>Create Chat</button>
-
-                <p>Make an account to add a file!</p>
             </div>
-        )
+
+            <button onClick={() => handleCreate(title, subject, level, setError, setPage)}>Create Chat</button>
+            <p>Make an account to add a file!</p>
+        </div>
+    )
 }
 
 export default NewChatInfo
