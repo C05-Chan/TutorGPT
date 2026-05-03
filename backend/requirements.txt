@@ -6,3 +6,6 @@ requests
 openai
 google-genai
 bcrypt
+pytest
+pytest-asyncio
+httpx

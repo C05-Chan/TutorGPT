@@ -86,23 +86,23 @@ function Signup({ setPage }) {
             {error && <ErrorPopup message={error} />}
 
             <div className="signup-feature">
-                <label>Username: </label>
-                <input onChange={(event) => setUsername(event.target.value)} />
+                <label htmlFor="username">Username: </label>
+                <input id="username" onChange={(event) => setUsername(event.target.value)} />
             </div>
 
             <div className="signup-feature">
-                <label>Email: </label>
-                <input onChange={(event) => setEmail(event.target.value)} />
+                <label htmlFor="email">Email: </label>
+                <input id="email" onChange={(event) => setEmail(event.target.value)} />
             </div>
 
             <div className="signup-feature">
-                <label>Password: </label>
-                <input type="password" onChange={(event) => setPassword(event.target.value)} />
+                <label htmlFor="password">Password: </label>
+                <input id="password" type="password" onChange={(event) => setPassword(event.target.value)} />
             </div>
 
             <div className="signup-feature">
-                <label>Confirm Password: </label>
-                <input type="password" onChange={(event) => setConfirmPassword(event.target.value)} />
+                <label htmlFor="confirm">Confirm Password: </label>
+                <input id="confirm" type="password" onChange={(event) => setConfirmPassword(event.target.value)} />
             </div>
 
             <button onClick={() => handleSignup(username, email, password, confirmPassword, setError, setPage)}>Sign Up</button>

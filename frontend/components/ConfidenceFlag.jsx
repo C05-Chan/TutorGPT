@@ -7,6 +7,6 @@ export default function ConfidenceFlag({ confidence }) {
     }
 
     return (
-        <span className="low-confidence"><FlagWarningIcon/></span>
+        <span className="low-confidence"><FlagWarningIcon/> Confidence is low, advise to do more research.</span>
     )
 }

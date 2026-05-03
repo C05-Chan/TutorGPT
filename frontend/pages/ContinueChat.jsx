@@ -7,14 +7,14 @@ import ConfidenceFlag from "../components/ConfidenceFlag"
 
 async function fetchMessages(setMessages) {
     if (localStorage.getItem("userID")) {
-        const res = await fetch(`/api/retrievemessages?chatSessionID=${localStorage.getItem("chatSessionID")}`, {
+        const res = await fetch(`/api/getmessages?chatSessionID=${localStorage.getItem("chatSessionID")}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
         const data = await res.json()
         setMessages(data.messages || [])
     } else {
-        const res = await fetch(`/api/retrievemessages?tempChatSessionID=${localStorage.getItem("tempChatSessionID")}`, {
+        const res = await fetch(`/api/getmessages?tempChatSessionID=${localStorage.getItem("tempChatSessionID")}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
@@ -25,7 +25,7 @@ async function fetchMessages(setMessages) {
 
 async function fetchChatInfo(setChatTitle) {
     if (localStorage.getItem("userID")) {
-        const res = await fetch(`/api/retrievechatinfo?chatSessionID=${localStorage.getItem("chatSessionID")}`, {
+        const res = await fetch(`/api/getchatinfo?chatSessionID=${localStorage.getItem("chatSessionID")}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
@@ -35,14 +35,14 @@ async function fetchChatInfo(setChatTitle) {
         console.log(data)
         return data
     } else {
-        const res = await fetch(`/api/retrievetempchatinfo?tempChatSessionID=${localStorage.getItem("tempChatSessionID")}`, {
+        const res = await fetch(`/api/gettempchatinfo?tempChatSessionID=${localStorage.getItem("tempChatSessionID")}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
 
-    
         const data = await res.json()
         setChatTitle(data.tempChatTitle)
+        
         console.log(data)
         return data
     }
@@ -134,7 +134,7 @@ function ContinueChat() {
     
                 <div className="chat-main">
                     <h2>{chatTitle}</h2>
-                    <p>Refers to this document: <a href={`/api/getfile chatSessionID=${localStorage.getItem("chatSessionID")}`} download>
+                    <p>Refers to this document: <a href={`/api/getfile?chatSessionID=${localStorage.getItem("chatSessionID")}`} download>
                         {uploadedDoc[0]}
                     </a></p>
             

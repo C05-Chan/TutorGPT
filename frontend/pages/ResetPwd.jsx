@@ -55,18 +55,18 @@ function ResetPassword({ setPage }) {
             {error && <ErrorPopup message={error} />}
 
             <div className="restpwd-feature">
-                <label>Email:</label>
-                <input onChange={(event) => setEmail(event.target.value)} />
+                <label htmlFor="email">Email:</label>
+                <input id="email" onChange={(event) => setEmail(event.target.value)} />
             </div>
 
             <div className="restpwd-feature">
-                <label>New Password:</label>
-                <input type="password" onChange={(event) => setPassword(event.target.value)} />
+                <label htmlFor="password">New Password:</label>
+                <input id="password" type="password" onChange={(event) => setPassword(event.target.value)} />
             </div>
 
             <div className="restpwd-feature">
-                <label>Confirm New Password:</label>
-                <input type="password" onChange={(event) => setConfirmPassword(event.target.value)} />
+                <label htmlFor="confirm">Confirm New Password:</label>
+                <input id="confirm" type="password" onChange={(event) => setConfirmPassword(event.target.value)} />
             </div>
 
             <button onClick={() => handleResetPassword(email, password, confirmPassword, setError, setPage)}>Reset Password</button>

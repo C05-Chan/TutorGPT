@@ -8,7 +8,7 @@ import ConfidenceFlag from "../components/ConfidenceFlag"
 
 async function fetchChatInfo(setChatTitle) {
     if (localStorage.getItem("userID")) {
-        const res = await fetch(`/api/retrievechatinfo?chatSessionID=${localStorage.getItem("chatSessionID")}`, {
+        const res = await fetch(`/api/getchatinfo?chatSessionID=${localStorage.getItem("chatSessionID")}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
@@ -18,7 +18,7 @@ async function fetchChatInfo(setChatTitle) {
         console.log(data)
         return data
     } else {
-        const res = await fetch(`/api/retrievetempchatinfo?tempChatSessionID=${localStorage.getItem("tempChatSessionID")}`, {
+        const res = await fetch(`/api/gettempchatinfo?tempChatSessionID=${localStorage.getItem("tempChatSessionID")}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
@@ -110,7 +110,7 @@ function NewChat() {
     
                 <div className="chat-main">
                     <h2>{chatTitle}</h2>
-                    <p>Refers to this document: <a href={`/api/getfile chatSessionID=${localStorage.getItem("chatSessionID")}`} download>
+                    <p>Refers to this document: <a href={`/api/getfile?chatSessionID=${localStorage.getItem("chatSessionID")}`} download>
                         {uploadedDoc[0]}
                     </a></p>
                     <ChatPromptBar messages={messages} setMessage={setMessage} />

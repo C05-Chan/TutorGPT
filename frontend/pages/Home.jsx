@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { TrashIcon }from "../components/Icons.jsx";
 
 async function fetchChats() {
-    const res = await fetch(`/api/retrievechats?user_id=${localStorage.getItem("userID")}`, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-        })
+    const res = await fetch(`/api/getchats?user_id=${localStorage.getItem("userID")}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+    })
     const data = await res.json()
 
     console.log("chats:", data.chats)
@@ -14,10 +14,10 @@ async function fetchChats() {
 }
 
 async function fetchTempChats() {
-    const res = await fetch(`/api/retrievetempchats?tempChatSessionID=${localStorage.getItem("tempChatSessionID")}`, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-        })
+    const res = await fetch(`/api/gettempchatinfo?tempChatSessionID=${localStorage.getItem("tempChatSessionID")}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+    })
     const data = await res.json()
 
     console.log("tempChats:", data.tempChats)
