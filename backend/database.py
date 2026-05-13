@@ -33,3 +33,4 @@ def init_db():
         connection.executescript(file.read()) #this reads the file and executes the SQL statements and creates the schema inside the file
 
     connection.close()
+    

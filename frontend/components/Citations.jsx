@@ -1,6 +1,6 @@
 export default function Citations({citations}) {
     console.log("citations:", citations)
-    if (!citations || citations.length === 0) {
+    if (!citations || citations.length === 0) { 
         return (
             <div className="citations-bar">
                 <h3>Sources and Citations</h3>

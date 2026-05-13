@@ -1,60 +1,15 @@
 import { useState, useEffect } from "react"
 import ReactMarkdown from "react-markdown"
 import remarkBreaks from "remark-breaks";
+
+import { fetchCitations, fetchDocuments, fetchChatInfo } from "../utility";
 import ChatPromptBar from "../components/ChatPromptBar"
 import Citations  from "../components/Citations"
 import ConfidenceFlag from "../components/ConfidenceFlag"
 
 
-async function fetchChatInfo(setChatTitle) {
-    if (localStorage.getItem("userID")) {
-        const res = await fetch(`/api/getchatinfo?chatSessionID=${localStorage.getItem("chatSessionID")}`, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-        })
-
-        const data = await res.json()
-        setChatTitle(data.chatTitle)
-        console.log(data)
-        return data
-    } else {
-        const res = await fetch(`/api/gettempchatinfo?tempChatSessionID=${localStorage.getItem("tempChatSessionID")}`, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-        })
-
-    
-        const data = await res.json()
-        setChatTitle(data.tempChatTitle)
-        console.log(data)
-        return data
-    }
-}
-
-async function fetchDocuments(setUploadedDoc) {
-    const chatID = localStorage.getItem("chatSessionID")
-    const res = await fetch(`/api/getdocument?chatSessionID=${chatID}`)
-    const data = await res.json()
-    setUploadedDoc(data.documents[0] || null) 
-}
-
-async function fetchCitations(messageID, setSelectedCitations) {
-    console.log("fetchCitations called with messageID:", messageID)
-    const res = await fetch(`/api/getcitations?messageID=${messageID}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-    })
-    const data = await res.json()
-
-    if (!data.citations || data.citations.length === 0) {
-        setSelectedCitations(["empty"])  // special flag
-    } else {
-        setSelectedCitations(data.citations)
-    }
-    console.log("citations data:", data)
-}
-
 function NewChat() {
+
     const [chatTitle, setChatTitle] = useState("")
     const [messages, setMessage] = useState([])
     const [uploadedDoc, setUploadedDoc] = useState(null)
@@ -65,17 +20,17 @@ function NewChat() {
         fetchDocuments(setUploadedDoc)
     }, [])
 
-    const pairs = []
+    const message_pairs = []
     for (let i = 0; i < messages.length; i += 2) {
-        pairs.push([messages[i], messages[i + 1]])
+        message_pairs.push([messages[i], messages[i + 1]])
     }
     
-    pairs.reverse()
+    message_pairs.reverse()
 
     let messagesList = []
-    for (let i = 0; i < pairs.length; i++) {
-        const userMsg = pairs[i][0]
-        const aiMsg = pairs[i][1]
+    for (let i = 0; i < message_pairs.length; i++) {
+        const userMsg = message_pairs[i][0]
+        const aiMsg = message_pairs[i][1]
 
         if (userMsg) {
             messagesList.push(
@@ -135,4 +90,5 @@ function NewChat() {
         </div>
     )
 }
+
 export default NewChat

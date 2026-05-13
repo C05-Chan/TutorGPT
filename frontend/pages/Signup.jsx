@@ -3,6 +3,9 @@ import ErrorPopup from "../components/ErrorMessage.jsx"
 import { localStorageSettingsLoader, getUserInfo } from "../utility.jsx"
 
 async function handleSignup(username, email, password, confirmPassword, setError, setPage) {
+    
+// This function checks if all requirements are met for signing up
+
     if (!username || !email || !password) {
         console.log("not all fields filled in")
         return setError("All fields are required.")

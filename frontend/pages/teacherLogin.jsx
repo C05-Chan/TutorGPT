@@ -1,19 +1,17 @@
 import { useState } from "react"
 import ErrorPopup from "../components/ErrorMessage.jsx"
-import { localStorageSettingsLoader, getUserInfo } from "../utility.jsx"
-
+import { getUserInfo } from "../utility.jsx"
 
 async function handleLogin(email, password, setError, setPage) {
     
 //This function checks for missing details? data? when trying to log in and checks if the user can log in, also sends an error message if user cant log in 
-    const isTeacher = false
+    const isTeacher = true
+    
     if (!email || !password) {
         setError("Please fill all fields.")
         return;
     }
     const emailCheck = email.toLowerCase()
-
-    console.log(email,password)
     
         const res = await fetch("/api/login", {
             method: "POST",
@@ -24,9 +22,8 @@ async function handleLogin(email, password, setError, setPage) {
         const data = await res.json()
 
         if (data.success) {
-            const userID = await getUserInfo(emailCheck)
-            await localStorageSettingsLoader(userID)
-            setPage("home")
+            await getUserInfo(emailCheck, true)
+            setPage("teacherdashboard")
 
         } else {
             setError("Unable to Login. Please check details")
@@ -34,15 +31,14 @@ async function handleLogin(email, password, setError, setPage) {
         }
     }
 
-function Login({ setPage }) {
+function TeacherLogin({ setPage }) {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [error, setError] = useState("")
 
-
     return (
         <div className="login-container">
-            <h2>Login</h2>
+            <h2>Teacher's Login</h2>
 
             {error && <ErrorPopup message={error} />}
 
@@ -59,21 +55,11 @@ function Login({ setPage }) {
             <button onClick={() => handleLogin(email, password, setError, setPage)}>Login</button>
 
             <div className="login-feature">
-                <p>Don't have an account?</p>
-                <button onClick={() => setPage("signup")}>Sign Up</button>
-            </div>
-
-            <div className="login-feature">
                 <p>Forgotten Password?</p>
                 <button onClick={() => setPage("resetpwd")}>Reset Password</button>
-            </div>
-
-            <div className="login-feature">
-                <p>Are you a teacher?</p>
-                <button onClick={() => setPage("teacherlogin")}>Teacher Login</button>
             </div>
         </div>
     )
 }
 
-export default Login
+export default TeacherLogin

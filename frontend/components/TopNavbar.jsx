@@ -27,6 +27,21 @@ export default function TopNavbar({ setPage }) {
     )
   }
 
+  else if (localStorage.getItem("teacherID")){
+        return (
+      <div className="navbar">
+        <h1 className="logo">Tutor-GPT</h1>
+        
+        <div className="navbar-right">
+          <button className='navbar-btns navbar-settings'
+            onClick={goSettings}>
+            <SettingsIcon/>
+          </button>
+        </div>
+      </div>
+    )
+  }
+  
   return (
     <div className="navbar">
       <div className="navbar-left">
