@@ -8,9 +8,14 @@
     "concurrently": "^9.2.1"
   },
   "scripts": {
-    "setup": "cd frontend && npm install && cd ../backend && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt",
-    "dev": "concurrently -n \"backend,frontend\" -c \"green,blue\" \"cd backend && venv/bin/python -m uvicorn main:app --reload\" \"cd frontend && npm run dev\"",
-    "start": "npm run dev"
+    "setup:mac": "cd frontend && npm install && cd ../backend && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt",
+    "setup:windows": "cd frontend && npm install && cd ../backend && python -m venv venv && venv\\Scripts\\pip install cffi==1.17.1 && venv\\Scripts\\pip install cryptography==42.0.8 && venv\\Scripts\\pip install -r requirements.txt",
+    "dev:mac": "concurrently -n \"backend,frontend\" -c \"green,blue\" \"cd backend && venv/bin/python -m uvicorn main:app --reload\" \"cd frontend && npm run dev\"",
+    "dev:windows": "concurrently -n \"backend,frontend\" -c \"green,blue\" \"cd backend && venv\\Scripts\\python -m uvicorn main:app --reload\" \"cd frontend && npm run dev\"",
+    "start:mac": "npm run dev:mac",
+    "start:windows": "npm run dev:windows",
+    "start": "npm run dev:mac",
+    "dev": "npm run dev:mac"
   },
   "keywords": [],
   "author": "",

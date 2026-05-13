@@ -1,11 +1,11 @@
-#########################################################################
-#                                                                       #
-#       This file acts as the backend server for the application        #
-#           - Uses FastAPI                                              #
-#           - Connects frontend and database                            #
-#           - Calls the AI services                                     #
-#                                                                       #
-#########################################################################
+#################################################################
+#                                                               #
+#   This file acts as the backend server for the application    #
+#   - Uses FastAPI                                              #
+#   - Connects frontend and database                            #
+#   - Calls the AI services                                     #
+#                                                               #
+#################################################################
 
 import bcrypt
 import json
@@ -21,18 +21,19 @@ app = FastAPI()
 
 init_db()
 
-################################
-#                              #
-#       REUSED FUNCTIONS       #
-#                              #
-################################
+##############################################
+#                                            #
+#              REUSED FUNCTIONS              #
+#                                            #
+##############################################
 
 def parse_response(ai_response):
-###############################################################################################################
-#                                                                                                             #
-#       This function changes the ai response from json to a python dictionary and gets the data inside       #
-#                                                                                                             #
-###############################################################################################################
+    ########################################################################################################
+    #                                                                                                      #
+    #   This function changes the ai response from json to a python dictionary and gets the data inside    #
+    #                                                                                                      #
+    ########################################################################################################
+    
     parsed = json.loads(ai_response) # this convert the ai response to python diction from json string
     message_text = parsed.get("response", ai_response) # this retrieves the parsed json response or just falls back to the ai_response if there is not response key 
     
@@ -50,12 +51,12 @@ def parse_response(ai_response):
     }
     
 def save_citations(cursor, citations, message_id, file=None, chatSessionID=None):
-###############################################################################################################
-#                                                                                                             #
-#       This function saves the citations from the AI response into the database                              #
-#       and links them to the message.                                                                        #
-#                                                                                                             #
-###############################################################################################################
+    ###############################################################################################################
+    #                                                                                                             #
+    #   This function saves the citations from the AI response into the database and links them to the message    #
+    #                                                                                                             #
+    ###############################################################################################################
+    
     for c in citations: # for every citation in the array
         source = c["source"].strip().lower() # this makes the source (e.g external or uploaded document) to have no spaces behind or infront of the word and forces lowercase.
 
@@ -86,21 +87,20 @@ def save_citations(cursor, citations, message_id, file=None, chatSessionID=None)
             if citation:
                 citation_id = citation[0]
                 cursor.execute("INSERT OR IGNORE INTO messageCitations (messageID, citationID) VALUES (?, ?)", (message_id, citation_id))
-    
 
-########################################
-#                                      #
-#       ACCOUNT LOGIN AND SIGNUP       #
-#                                      #
-########################################
+######################################################
+#                                                    #
+#              ACCOUNT LOGIN AND SIGNUP              #
+#                                                    #
+######################################################
 
 @app.post("/api/login")
 def login(data: dict = Body(...)):
-################################################################################################
-#                                                                                              #
-#       This function checks if the input matches the user's email and password stored         #
-#                                                                                              #
-################################################################################################
+    ################################################################################################
+    #                                                                                              #
+    #       This function checks if the input matches the user's email and password stored         #
+    #                                                                                              #
+    ################################################################################################
 
     email = data["email"].lower()
     password = data["password"]
@@ -134,11 +134,11 @@ def login(data: dict = Body(...)):
 
 @app.post("/api/signup")
 def signup(data: dict = Body(...)):
-##################################################################################################################
-#                                                                                                                #
-#       This function creates a new row in the database when a signup is successful and return the user ID       #
-#                                                                                                                #
-##################################################################################################################
+    #########################################################################################################
+    #                                                                                                       #
+    #   This function creates a new row in the database when a signup is successful and return the user ID  #
+    #                                                                                                       #
+    #########################################################################################################
     username = data["username"]
     email = data["email"].lower() # forces all emails to be lowercase()
     password = data["password"]
@@ -163,11 +163,12 @@ def signup(data: dict = Body(...)):
 
 @app.post("/api/resetpassword")
 def reset_password(data: dict = Body(...)):
-#####################################################################################################
-#                                                                                                   #
-#       This function updates the password for the user when they want to change the password       #
-#                                                                                                   #
-#####################################################################################################
+    #############################################################################################
+    #                                                                                           #
+    #   This function updates the password for the user when they want to change the password   #
+    #                                                                                           #
+    #############################################################################################
+
     new_password = data["password"]
     email = data["email"].lower()
 
@@ -185,11 +186,12 @@ def reset_password(data: dict = Body(...)):
 
 @app.get("/api/emailcheck")
 def email_check(email: str):
-#############################################################################################
-#                                                                                           #
-#       This function checks if the email is already in the database for the signup         #
-#                                                                                           #
-#############################################################################################
+    ####################################################################################
+    #                                                                                  #
+    #   This function checks if the email is already in the database for the signup    #
+    #                                                                                  #
+    ####################################################################################
+    
     email = email.lower() # converts all emails to be all lower case
 
     connection = get_connection()
@@ -207,11 +209,12 @@ def email_check(email: str):
 
 @app.get("/api/userinfo")
 def get_user(email: str):
-##########################################################################################
-# #                                                                                       #
-# #       This function gets if users ID and username from the database after login       #
-# #                                                                                       #
-# #########################################################################################
+    #################################################################################
+    #                                                                               #
+    #   This function gets if users ID and username from the database after login   #
+    #                                                                               #
+    #################################################################################
+    
     email = email.lower()
 
     connection = get_connection()
@@ -227,18 +230,20 @@ def get_user(email: str):
     else:
         return {"error": True, "message": "User not found."}
 
-###################
-#                 #
-#       CHAT      #
-#                 #
-###################
+##################################
+#                                #
+#              CHAT              #
+#                                #
+##################################
+
 @app.post("/api/createchat")
 def new_chat(data: dict = Body(...)):
-####################################################################
-#                                                                  #
-#       This function creates a new chat for logged in users       #
-#                                                                  #
-####################################################################
+    #############################################################
+    #                                                           #
+    #   This function creates a new chat for logged in users    #
+    #                                                           #
+    #############################################################
+    
     user_id = data["userID"]
     chat_title = data["chatTitle"]
     chat_subject = data["chatSubject"]
@@ -260,11 +265,12 @@ def new_chat(data: dict = Body(...)):
 
 @app.post("/api/createtempchat")
 def create_temp_chat(data: dict = Body(...)):
-#########################################################################
-#                                                                       #
-#       This function creates and/ or replace the temporary chats       #
-#                                                                       #
-#########################################################################
+    #################################################################
+    #                                                               #
+    #   This function creates and/ or replace the temporary chats   #
+    #                                                               #
+    #################################################################
+    
     temp_chat_title = data["tempChatTitle"]
     temp_chat_subject = data["tempChatSubject"]
     temp_chat_level = data["tempChatExplanationLevel"]
@@ -282,11 +288,11 @@ def create_temp_chat(data: dict = Body(...)):
 
 @app.get("/api/getchats")
 def get_chats(user_id: int):
-########################################################
-#                                                      #
-#       This function retrieve all chat sessions       #
-#                                                      #
-########################################################
+    #################################################
+    #                                               #
+    #   This function retrieve all chat sessions    #
+    #                                               #
+    #################################################
 
     connection = get_connection()
     cursor = connection.cursor()
@@ -298,14 +304,14 @@ def get_chats(user_id: int):
 
     return {"chats": chats}
 
-
 @app.get("/api/getchatinfo")
 def get_chat_info(chatSessionID: int):
-###########################################################################
-#                                                                         #
-#       This function retrieve the chat sessions' title and subject       #
-#                                                                         #
-###########################################################################
+    ###################################################################
+    #                                                                 #
+    #   This function retrieve the chat sessions' title and subject   #
+    #                                                                 #
+    ###################################################################
+    
     connection = get_connection()
     cursor = connection.cursor()
     
@@ -321,11 +327,11 @@ def get_chat_info(chatSessionID: int):
     
 @app.get("/api/gettempchatinfo")
 def get_temp_chat_info(tempChatSessionID: int):
-#####################################################################################
-#                                                                                   #
-#       This function retrieve the temporary chat sessions' title and subject       #
-#                                                                                   #
-#####################################################################################
+    #############################################################################
+    #                                                                           #
+    #   This function retrieve the temporary chat sessions' title and subject   #
+    #                                                                           #
+    #############################################################################
 
     connection = get_connection()
     cursor = connection.cursor()
@@ -348,11 +354,11 @@ def get_temp_chat_info(tempChatSessionID: int):
     
 @app.post("/api/deletechat")
 def delete_chat(data: dict = Body(...)):
-################################################################################
-#                                                                              #
-#       This function deletes logged in user's chat sessions from database     #
-#                                                                              #
-################################################################################
+    ###########################################################################
+    #                                                                         #
+    #   This function deletes logged in user's chat sessions from database    #
+    #                                                                         #
+    ###########################################################################
 
     chatSessionID = data["chatSessionID"]
     
@@ -368,11 +374,12 @@ def delete_chat(data: dict = Body(...)):
 
 @app.post("/api/deletetempchat")
 def delete_temp_chat(data: dict = Body(...)):
-#########################################################################
-#                                                                       #
-#       This function deletes temporary chat sessions from database     #
-#                                                                       #
-#########################################################################
+    #####################################################################
+    #                                                                   #
+    #    This function deletes temporary chat sessions from database    #
+    #                                                                   #
+    #####################################################################
+    
     tempChatSessionID = data["tempChatSessionID"]
     
     connection = get_connection()
@@ -385,19 +392,20 @@ def delete_temp_chat(data: dict = Body(...)):
     
     return {"success": True}
 
-##################################
-#                                #
-#       MESSAGE AND PROMPTS      #
-#                                #
-##################################
+#################################################
+#                                               #
+#              MESSAGE AND PROMPTS              #
+#                                               #
+#################################################
 
 @app.get("/api/getmessages")
 def get_messages(chatSessionID: int = None, tempChatSessionID: int = None):
-############################################################################################
-#                                                                                          #
-#       This function retrieve the temporary chat and normal chat sessions' messages       #
-#                                                                                          #
-############################################################################################
+    ######################################################################################
+    #                                                                                    #
+    #    This function retrieve the temporary chat and normal chat sessions' messages    #
+    #                                                                                    #
+    ######################################################################################
+    
     connection = get_connection()
     cursor = connection.cursor()
     
@@ -415,19 +423,18 @@ def get_messages(chatSessionID: int = None, tempChatSessionID: int = None):
 
 @app.post("/api/submitloggedprompt")
 def submit_logged_prompt(data: dict = Body(...)):
-#######################################################################################
-#                                                                                     #
-#       This calls and sends the prompt to the AI. Then it parses the response        #
-#       and saves into the database. This is for logged users                         #
-#                                                                                     #
-#######################################################################################
+    ######################################################################################################################################
+    #                                                                                                                                    #
+    #    This calls and sends the prompt to the AI. Then it parses the response and saves into the database. This is for logged users    #
+    #                                                                                                                                    #
+    ######################################################################################################################################
+    
     prompt = data["prompt"] # user prompt
     chatSessionID = data["chatSessionID"] # chat session ID for the logged-in users to know where the messages are saved for which session in the database.
     response_length = data["responseLength"] 
     confidence = ""
     confidence_reason = ""
     citations = []
-
 
     connection = get_connection()
     cursor = connection.cursor()
@@ -465,7 +472,7 @@ def submit_logged_prompt(data: dict = Body(...)):
     
     try:
         response = parse_response(ai_response)
-        
+
         message_text = response["message_text"]
         confidence_score = response["confidence"]
         confidence_reason = response["confidence_reason"]
@@ -483,7 +490,6 @@ def submit_logged_prompt(data: dict = Body(...)):
     cursor.execute("SELECT messageID FROM messages WHERE chatSessionID = ? AND sender = 'TutorGPT' ORDER BY messageTime DESC LIMIT 1", (chatSessionID,)) 
     
     message = cursor.fetchone()
-    
     message_id = message[0]
     
     print("citations", citations)
@@ -497,12 +503,11 @@ def submit_logged_prompt(data: dict = Body(...)):
 
 @app.post("/api/submitunloggedprompt")
 def submit_unlogged_prompt(data: dict = Body(...)):
-#######################################################################################
-#                                                                                     #
-#       This calls and sends the prompt to the AI. Then it parses the response        #
-#       and saves into the database for unlogged in users                             #
-#                                                                                     #
-#######################################################################################
+    ################################################################################################################################
+    #                                                                                                                              #
+    #   This calls and sends the prompt to the AI. Then it parses the response and saves into the database for unlogged in users   #
+    #                                                                                                                              #
+    ################################################################################################################################
     prompt = data["prompt"]
     tempChatSessionID = data["tempChatSessionID"]
     response_length = data["responseLength"]
@@ -514,6 +519,7 @@ def submit_unlogged_prompt(data: dict = Body(...)):
     cursor = connection.cursor()
 
     cursor.execute("SELECT tempChatSubject, tempChatExplanationLevel FROM tempChats WHERE tempChatSessionID = ?", (tempChatSessionID,))
+    
     chat_info = cursor.fetchone()
     
     if chat_info is None:
@@ -562,19 +568,19 @@ def submit_unlogged_prompt(data: dict = Body(...)):
 
     return {"success": True, "message": message_text, "confidence": confidence, "messageID": message_id}
 
-#######################
-#                     #
-#       DOCUMENTS     #
-#                     #
-#######################
+#######################################
+#                                     #
+#              DOCUMENTS              #
+#                                     #
+#######################################
 
 @app.post("/api/uploaddocument")
 async def upload_document(file: UploadFile = File(...), chatSessionID: int = Form(...)):
-#######################################################################################
-#                                                                                     #
-#       This function saves any uploaded document into the database                   #
-#                                                                                     #
-#######################################################################################
+    ###################################################################
+    #                                                                 #
+    #   This function saves any uploaded document into the database   #
+    #                                                                 #
+    ###################################################################
 
     file_path = "uploads/" + str(chatSessionID) + "_" + file.filename #this prevents clashing document names
 
@@ -596,11 +602,11 @@ async def upload_document(file: UploadFile = File(...), chatSessionID: int = For
 
 @app.get("/api/getdocument")
 def get_documents(chatSessionID: int):
-######################################################################################################
-#                                                                                                    #
-#       This function gets the metadata of the uploaded document from the database                   #
-#                                                                                                    #
-######################################################################################################
+    ###################################################################################
+    #                                                                                 #
+    #   This function gets the metadata of the uploaded document from the database    #
+    #                                                                                 #
+    ###################################################################################
     connection = get_connection()
     cursor = connection.cursor()
     
@@ -613,11 +619,12 @@ def get_documents(chatSessionID: int):
 
 @app.get("/api/getfile")
 def get_file(chatSessionID: int):
-########################################################################
-#                                                                      #
-#       This function gets a downloadable file from the database       #
-#                                                                      #
-########################################################################
+    #################################################################
+    #                                                               #
+    #   This function gets a downloadable file from the database    #
+    #                                                               #
+    #################################################################
+    
     connection = get_connection()
     cursor = connection.cursor()
     
@@ -634,27 +641,30 @@ def get_file(chatSessionID: int):
 
     return FileResponse(filepath, filename=filename) # return actual file that is downloadable
 
-########################
-#                      #
-#       CITATIONS      #
-#                      #
-########################
+#######################################
+#                                     #
+#              CITATIONS              #
+#                                     #
+#######################################
 
 @app.get("/api/getcitations")
 def get_citations(messageID: int):
-###################################################################################################
-#                                                                                                 #
-#       This function gets all the citation associated to the ai response from the database       #
-#                                                                                                 #
-###################################################################################################
+    ############################################################################################
+    #                                                                                          #
+    #   This function gets all the citation associated to the ai response from the database    #
+    #                                                                                          #
+    ############################################################################################
     connection = get_connection()
     cursor = connection.cursor()
     
     cursor.execute("""
-        SELECT citationName, citationText, citationSource, citationURL 
-        FROM citations
-        JOIN messageCitations ON messageCitations.citationID = citations.citationID 
-        WHERE messageCitations.messageID = ?
+        SELECT 
+            citationName, citationText, citationSource, citationURL 
+        FROM 
+            citations
+            JOIN messageCitations ON messageCitations.citationID = citations.citationID 
+        WHERE 
+            messageCitations.messageID = ?
     """, (messageID,))
     
     citations = cursor.fetchall()
@@ -662,19 +672,19 @@ def get_citations(messageID: int):
     
     return {"citations": citations} 
 
-#######################
-#                     #
-#       SETTINGS      #
-#                     #
-#######################
+######################################
+#                                    #
+#              SETTINGS              #
+#                                    #
+######################################
     
 @app.get("/api/userSettings")
 def get_user_settings(user_id: int):
-####################################################
-#                                                  #
-#       This function gets the user settings       #
-#                                                  #
-####################################################
+    ############################################
+    #                                          #
+    #   This function gets the user settings   #
+    #                                          #
+    ############################################
     connection = get_connection()
     cursor = connection.cursor()
     
@@ -696,11 +706,12 @@ def get_user_settings(user_id: int):
 
 @app.post("/api/updateSettings")
 def update_settings(data: dict = Body(...)):
-######################################################
-#                                                    #
-#       This function update the user settings       #
-#                                                    #
-######################################################
+    ##############################################
+    #                                            #
+    #   This function update the user settings   #
+    #                                            #
+    ##############################################
+    
     user_id = data["userID"]
     response_length = data["responseLength"]
     display_mode = data["displayMode"]
@@ -719,11 +730,12 @@ def update_settings(data: dict = Body(...)):
 
 @app.post("/api/deleteaccount")
 def delete_account(data: dict = Body(...)):
-#################################################################################################
-#                                                                                               #
-#       This function deletes the user account and all the data associated to the account       #
-#                                                                                               #
-#################################################################################################
+    #########################################################################################
+    #                                                                                       #
+    #   This function deletes the user account and all the data associated to the account   #
+    #                                                                                       #
+    #########################################################################################
+    
     userID = data["userID"]
     
     connection = get_connection()
