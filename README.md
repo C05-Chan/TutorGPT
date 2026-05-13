@@ -80,16 +80,3 @@ npm run start:windows
 ```
 
 Then open your browser and go to: http://localhost:5173
-
----
-
-## Troubleshooting
-
-**Windows: `'venv' is not recognized`**
-Make sure you ran `npm run setup:windows` first, and that you're running `npm run start:windows` not `npm run start:mac`.
-
-**Windows: `Microsoft Visual C++ 14.0 or greater is required`**
-You need to install C++ Build Tools — see the Windows prerequisite section above.
-
-**Backend not starting / proxy errors on port 8000**
-The backend failed to start. Check the terminal output for errors and make sure your `API.env` file is set up correctly.
