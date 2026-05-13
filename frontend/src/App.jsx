@@ -14,10 +14,6 @@ import ResetPassword from "../pages/ResetPwd.jsx"
 import NewChatInfo from "../pages/NewChatInfo.jsx"
 import NewChat from "../pages/NewChat.jsx"
 import ContinueChat from "../pages/ContinueChat.jsx"
-import TeacherLogin from "../pages/teacherLogin.jsx"
-import Dashboard from "../pages/teacherDashboard.jsx"
-import TeacherChat from "../pages/teacherChat.jsx"
-
 
 function App() {
   const [page, setPage] = useState("home")
@@ -35,16 +31,13 @@ function App() {
       <TopNavbar setPage={setPage} />
 
       {page === "home" && <Home setPage={setPage} />}
-      {page === "teacherdashboard" && <Dashboard setPage={setPage} />}
       {page === "settings" && <Settings setPage={setPage} />}
       {page === "login" && <Login setPage={setPage} />}
-      {page === "teacherlogin" && <TeacherLogin setPage={setPage} />}
       {page === "signup" && <Signup setPage={setPage} />}
       {page === "resetpwd" && <ResetPassword setPage={setPage} />}
       {page === "newchatinfo"  && <NewChatInfo setPage={setPage} />}
       {page === "newchat" && <NewChat />}
       {page === "continuechat" && <ContinueChat />}
-      {page === "teacherchat" && <TeacherChat setPage={setPage} />}
 
     </>
   )

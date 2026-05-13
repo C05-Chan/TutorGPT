@@ -75,8 +75,6 @@ async function handleDeleteAccount(setPage) {
 function handleLogout() {
         localStorage.removeItem("userID")
         localStorage.removeItem("username")
-        localStorage.removeItem("teacherID")
-        localStorage.removeItem("teacherName")
         window.location.reload()
 }
 
@@ -87,7 +85,6 @@ function Settings({setPage}) {
     const [displayMode, setDisplayMode] = useState("")
 
     const userID = localStorage.getItem("userID")
-    const teacherID = localStorage.getItem("teacherID")
 
     useEffect(() => {
         loadSettings(userID, setResponseLength, setDisplayMode, setDisplayTextSize, setDisplayFontStyle)
@@ -135,7 +132,7 @@ function Settings({setPage}) {
 
             <button onClick={() => saveUserSettings(userID ?? 'null', responseLength, displayMode, displayTextSize, displayFontStyle)}>Save Settings</button>
             {userID && <button onClick={() => handleDeleteAccount(setPage)}>Deactivate Account</button>}
-            {(userID|| teacherID) && <button onClick={handleLogout}>Logout</button>}
+            {(userID) && <button onClick={handleLogout}>Logout</button>}
         </div>
     )
 }

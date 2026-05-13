@@ -19,24 +19,17 @@ export async function localStorageSettingsLoader(userID) {
     return settings;
 }
 
-export async function getUserInfo(email, isTeacher = false) {
+export async function getUserInfo(email) {
     
-    const res = await fetch(`/api/userinfo?email=${email}&isTeacher=${isTeacher}`, {           
+    const res = await fetch(`/api/userinfo?email=${email}`, {           
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
     const data = await res.json()
 
-    if (isTeacher) {
-        localStorage.setItem("teacherID", data.teacherID)
-        localStorage.setItem("username", data.username)
-        return data.teacherID
-
-    } else {
         localStorage.setItem("userID", data.userID)
         localStorage.setItem("username", data.username)
         return data.userID
-    }
 }
 
 export async function fetchChatInfo(setChatTitle) {

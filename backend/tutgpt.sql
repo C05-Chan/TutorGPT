@@ -3,32 +3,13 @@
 -- 'CREATE TABLE IF NOT EXISTS' is used so there is no duplicated or missing tables
 -- 'ON DELETE CASCADE' is used when a user deletes their account or chat messages
 
-CREATE TABLE IF NOT EXISTS institution (
-    institutionID INTEGER PRIMARY KEY,
-    institutionName TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS teachers(
-    teacherID INTEGER PRIMARY KEY,
-    institutionID INTEGER NOT NULL,
-    teacherName TEXT NOT NULL,
-    teacherEmail TEXT NOT NULL,
-    teacherPassword TEXT NOT NULL,
-
-    FOREIGN KEY (institutionID) REFERENCES institution(institutionID) ON DELETE CASCADE,
-    UNIQUE (teacherEmail, institutionID)
-);
-
 CREATE TABLE IF NOT EXISTS users (
     userID INTEGER PRIMARY KEY,
-    institutionID INTEGER,
     username TEXT NOT NULL,
     email TEXT UNIQUE,
     password TEXT NOT NULL,
     createDate TEXT DEFAULT (DATETIME('now')),
-    deleteDate TEXT,
-
-    FOREIGN KEY (institutionID) REFERENCES institution(institutionID) ON DELETE CASCADE
+    deleteDate TEXT
 );
 
 CREATE TABLE IF NOT EXISTS accountSettings (
@@ -122,36 +103,17 @@ CREATE TABLE IF NOT EXISTS messageCitations (
 );
 
 -- INSERTS TO CREATE DEFAULT USERS, SETTINGS AND AN EXAMPLE CHAT
-
-INSERT OR IGNORE INTO institution (institutionName) VALUES 
-('University of Pythons'),
-('Manchester College'),
-('Morehead State University');
-
-INSERT OR IGNORE INTO teachers (institutionID, teacherName, teacherEmail, teacherPassword) VALUES
-(1, 'John Doe', 'john.doe@fakemail.com', '$2b$12$sdlVsjPPhgXU5GjFrzCx4OWe6xx5TYoIa9UbxrF93lM82g2.QhxwC'), -- password: password123
-(2, 'Jane Doe', 'jane.doe@fakemail.com', '$2b$12$sdlVsjPPhgXU5GjFrzCx4OWe6xx5TYoIa9UbxrF93lM82g2.QhxwC'); -- password: password123
-
-INSERT OR IGNORE INTO users (username, email, password) VALUES ('Test User', 'testuser@fakemail.com', '$2b$12$sdlVsjPPhgXU5GjFrzCx4OWe6xx5TYoIa9UbxrF93lM82g2.QhxwC'); -- password: password123
-
-INSERT OR IGNORE INTO users (institutionID, username, email, password) VALUES (1, 'Test Student', 'teststudent@example.com', '$2b$12$sdlVsjPPhgXU5GjFrzCx4OWe6xx5TYoIa9UbxrF93lM82g2.QhxwC'); -- password: password123
+INSERT OR IGNORE INTO users (username, email, password) VALUES 
+('Test User', 'testuser@fakemail.com', '$2b$12$sdlVsjPPhgXU5GjFrzCx4OWe6xx5TYoIa9UbxrF93lM82g2.QhxwC'); -- password: password123
 
 INSERT OR IGNORE INTO accountSettings (userID, responseLength, displayMode, displayTextSize, displayFontStyle) VALUES 
-(1, 'Medium', 'Light', 'Medium', 'Arial'),
-(2, 'Short', 'Dark', 'Large', 'Arial');
+(1, 'Medium', 'Light', 'Medium', 'Arial');
 
 INSERT OR IGNORE INTO chatSession (userID, chatTitle, chatSubject, chatExplanationLevel) VALUES 
-(1, 'Sample Advanced Mathematics Chat', 'Mathematics', 'Advanced'),
-(2, 'Sample Chat', 'Mathematics', 'Beginner');
+(1, 'Sample Advanced Mathematics Chat', 'Mathematics', 'Advanced');
 
 INSERT OR IGNORE INTO messages (chatSessionID, sender, messageContent, messageConfidence, messageConfidenceReason) VALUES 
 (1, 'User', 'This is the first example prompt!', NULL, NULL),
 (1, 'TutorGPT', 'This is the first example response with a low confidence!', '3', 'Just cause it is.' ),
 (1, 'User', 'This is the second example prompt!', NULL, NULL),
 (1, 'TutorGPT', 'This is the first example response with a high confidence!', '10', NULL);
-
-INSERT OR IGNORE INTO messages (chatSessionID, sender, messageContent, messageConfidence, messageConfidenceReason) VALUES 
-(2, 'User', 'This is the first example prompt and to be honest i do not understand vectors!', NULL, NULL),
-(2, 'TutorGPT', 'This is the first example response with a low confidence and vectors are so simple!', '3', 'Just cause it is.' ),
-(2, 'User', 'Great! Can you show me a vector', NULL, NULL),
-(2, 'TutorGPT', 'This is the first example response with a high confidence! No I can not sorry.', '10', NULL);

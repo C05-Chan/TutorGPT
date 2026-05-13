@@ -104,15 +104,11 @@ def login(data: dict = Body(...)):
 
     email = data["email"].lower()
     password = data["password"]
-    isTeacher = data["isTeacher"]
 
     connection = get_connection() # opens a connection to the database
     cursor = connection.cursor() # used to run SQL queries
     
-    if isTeacher: 
-        cursor.execute("SELECT teacherID, teacherPassword FROM teachers WHERE teacherEmail = ?", (email,))
-    else:
-        cursor.execute("SELECT userID, password FROM users WHERE email = ?", (email,))
+    cursor.execute("SELECT userID, password FROM users WHERE email = ?", (email,))
     
     result = cursor.fetchone() # returns a single row
     connection.close() # closes database connection when it is no longer used
@@ -132,10 +128,6 @@ def login(data: dict = Body(...)):
 
     
     if passwords_match_checker:
-        
-        if isTeacher:
-            return {"success": True, "teacherID": result[0]}
-        
         return {"success": True, "userID": result[0]}
     
     return {"success": False, "message": "Invalid Email or Password. Please Try Again."}
@@ -214,7 +206,7 @@ def email_check(email: str):
         return {"exists": False}
 
 @app.get("/api/userinfo")
-def get_user(email: str, isTeacher: bool = False):
+def get_user(email: str):
 ##########################################################################################
 # #                                                                                       #
 # #       This function gets if users ID and username from the database after login       #
@@ -224,33 +216,16 @@ def get_user(email: str, isTeacher: bool = False):
 
     connection = get_connection()
     cursor = connection.cursor()
+    
+    cursor.execute("SELECT userID, username FROM users WHERE email = ?", (email,))
+    
+    result = cursor.fetchone()
+    connection.close()
 
-    if isTeacher:
-        cursor.execute(
-            "SELECT teacherID, teacherName FROM teachers WHERE teacherEmail = ?",
-            (email,)
-        )
-        result = cursor.fetchone()
-        connection.close()
-
-        if result:
-            return {"teacherID": result[0], "username": result[1]}
-        else:
-            return {"success": False, "message": "Teacher not found."}
-
+    if result:
+        return {"userID": result[0], "username": result[1]}
     else:
-        cursor.execute(
-            "SELECT userID, username FROM users WHERE email = ?",  # fixed: was userEmail
-            (email,)
-        )
-        result = cursor.fetchone()
-        connection.close()
-
-        if result:
-            return {"userID": result[0], "username": result[1]}
-        else:
-            return {"success": False, "message": "User not found."}
-
+        return {"error": True, "message": "User not found."}
 
 ###################
 #                 #
@@ -316,12 +291,13 @@ def get_chats(user_id: int):
     connection = get_connection()
     cursor = connection.cursor()
     
-    cursor.execute("SELECT chatSessionID, chatTitle, chatCreateDate FROM chatSession WHERE userID = ? ORDER BY chatCreateDate DESC", (user_id,))
+    cursor.execute("SELECT chatSessionID, chatTitle, chatCreateDate FROM chatSession WHERE userID = ?", (user_id,))
     
     chats = cursor.fetchall()
     connection.close()
 
     return {"chats": chats}
+
 
 @app.get("/api/getchatinfo")
 def get_chat_info(chatSessionID: int):
@@ -760,99 +736,3 @@ def delete_account(data: dict = Body(...)):
     
     return {"success": True, "message":"Account deleted"}
 
-
-
-
-
-################################
-#                              #
-#       TEACHER ENDPOINTS      #
-#                              #
-################################
-
-@app.get("/api/userinfo")
-def get_user(email: str, isTeacher: bool = False):
-#########################################################################################
-#                                                                                       #
-#       This function gets the user's/teacher's ID and username from the database       #
-#       after login. isTeacher flag determines which table to query.                    #
-#                                                                                       #
-#########################################################################################
-    email = email.lower()
-
-    connection = get_connection()
-    cursor = connection.cursor()
-
-    if isTeacher:
-        cursor.execute(
-            "SELECT teacherID, teacherName FROM teachers WHERE teacherEmail = ?",
-            (email,)
-        )
-        result = cursor.fetchone()
-        connection.close()
-
-        if result:
-            return {"teacherID": result[0], "username": result[1]}
-        else:
-            return {"success": False, "message": "Teacher not found."}
-
-    else:
-        cursor.execute(
-            "SELECT userID, username FROM users WHERE email = ?",
-            (email,)
-        )
-        result = cursor.fetchone()
-        connection.close()
-
-        if result:
-            return {"userID": result[0], "username": result[1]}
-        else:
-            return {"success": False, "message": "User not found."}
-
-
-
-# Replace the /api/searchusers endpoint in main.py (currently around line 797)
-
-@app.get("/api/searchusers")
-def search_users(query: str, teacher_id: int):
-###############################################################################
-#                                                                             #
-#       This function searches for students that belong to the same           #
-#       institution as the logged-in teacher. Results are filtered            #
-#       by username or email matching the search query.                       #
-#                                                                             #
-###############################################################################
-    connection = get_connection()
-    cursor = connection.cursor()
-
-    # First get the teacher's institutionID
-    cursor.execute(
-        "SELECT institutionID FROM teachers WHERE teacherID = ?",
-        (teacher_id,)
-    )
-    teacher = cursor.fetchone()
-
-    if teacher is None:
-        connection.close()
-        return {"success": False, "message": "Teacher not found.", "users": []}
-
-    institution_id = teacher[0]
-
-    # Search users in the same institution by username or email
-    # Fixed: column is 'email' not 'userEmail'
-    like_query = f"%{query}%"
-    cursor.execute(
-        """
-        SELECT userID, username, email
-        FROM users
-        WHERE institutionID = ?
-          AND (username LIKE ? OR email LIKE ?)
-        ORDER BY username ASC
-        """,
-        (institution_id, like_query, like_query)
-    )
-
-    users = cursor.fetchall()
-    connection.close()
-
-    return {"users": users}

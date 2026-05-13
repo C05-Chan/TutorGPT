@@ -6,7 +6,6 @@ import { localStorageSettingsLoader, getUserInfo } from "../utility.jsx"
 async function handleLogin(email, password, setError, setPage) {
     
 //This function checks for missing details? data? when trying to log in and checks if the user can log in, also sends an error message if user cant log in 
-    const isTeacher = false
     if (!email || !password) {
         setError("Please fill all fields.")
         return;
@@ -18,7 +17,7 @@ async function handleLogin(email, password, setError, setPage) {
         const res = await fetch("/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: emailCheck, password, isTeacher})
+            body: JSON.stringify({ email: emailCheck, password})
         })
 
         const data = await res.json()
@@ -66,11 +65,6 @@ function Login({ setPage }) {
             <div className="login-feature">
                 <p>Forgotten Password?</p>
                 <button onClick={() => setPage("resetpwd")}>Reset Password</button>
-            </div>
-
-            <div className="login-feature">
-                <p>Are you a teacher?</p>
-                <button onClick={() => setPage("teacherlogin")}>Teacher Login</button>
             </div>
         </div>
     )
