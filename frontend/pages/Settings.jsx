@@ -132,7 +132,7 @@ function Settings({setPage}) {
 
             <button onClick={() => saveUserSettings(userID ?? 'null', responseLength, displayMode, displayTextSize, displayFontStyle)}>Save Settings</button>
             {userID && <button onClick={() => handleDeleteAccount(setPage)}>Deactivate Account</button>}
-            {userID && <button onClick={handleLogout}>Logout</button>}
+            {(userID) && <button onClick={handleLogout}>Logout</button>}
         </div>
     )
 }

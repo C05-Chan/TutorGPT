@@ -1,12 +1,14 @@
 
--- CREATES TABLES IF THEY DO NOT ALREADY EXISTS DUE TO FIRST TIME RUNNING APPLICATION
+-- Local SQLite3 Database
+-- 'CREATE TABLE IF NOT EXISTS' is used so there is no duplicated or missing tables
+-- 'ON DELETE CASCADE' is used when a user deletes their account or chat messages
 
 CREATE TABLE IF NOT EXISTS users (
     userID INTEGER PRIMARY KEY,
     username TEXT NOT NULL,
     email TEXT UNIQUE,
     password TEXT NOT NULL,
-    createDate TEXT DEFAULT (DATE('now')),
+    createDate TEXT DEFAULT (DATETIME('now')),
     deleteDate TEXT
 );
 
@@ -41,7 +43,6 @@ CREATE TABLE IF NOT EXISTS chatSession (
     FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE
 );
 
--- MESSAGES
 CREATE TABLE IF NOT EXISTS messages (
     messageID INTEGER PRIMARY KEY,
     chatSessionID INTEGER,
@@ -55,8 +56,12 @@ CREATE TABLE IF NOT EXISTS messages (
     FOREIGN KEY (chatSessionID) REFERENCES chatSession(chatSessionID) ON DELETE CASCADE,
     FOREIGN KEY (tempChatSessionID) REFERENCES tempChats(tempChatSessionID) ON DELETE CASCADE,
 
-    CHECK(sender IN ('User', 'TutorGPT')),
+    CHECK(sender IN ('User', 'TutorGPT')), 
+
+    -- This check is to ensure that either chatSessionID has a variable OR tempChatSessionID but not both at the same time.
     CHECK((chatSessionID IS NOT NULL AND tempChatSessionID IS NULL) OR (chatSessionID IS NULL AND tempChatSessionID IS NOT NULL)),
+
+    -- This check is to ensure that if it is a response from 'TutorGPT', it must have a messageConfidence
     CHECK(sender = 'User' OR (sender = 'TutorGPT' AND messageConfidence IS NOT NULL))
 );
 
@@ -82,8 +87,10 @@ CREATE TABLE IF NOT EXISTS citations (
 
     FOREIGN KEY (documentID) REFERENCES uploadedDocuments(documentID) ON DELETE CASCADE,
 
-    CHECK (citationSource != 'Uploaded Document' OR documentID IS NOT NULL),
-    CHECK(citationSource IN ('Uploaded Document', 'External Source'))
+    CHECK(citationSource IN ('Uploaded Document', 'External Source')),
+
+    -- This check is to ensure uploaded document citations are referencing to a documentID otherwise, its NULL.
+    CHECK (citationSource != 'Uploaded Document' OR documentID IS NOT NULL)
 );
 
 CREATE TABLE IF NOT EXISTS messageCitations (
@@ -96,10 +103,17 @@ CREATE TABLE IF NOT EXISTS messageCitations (
 );
 
 -- INSERTS TO CREATE DEFAULT USERS, SETTINGS AND AN EXAMPLE CHAT
+INSERT OR IGNORE INTO users (username, email, password) VALUES 
+('Test User', 'testuser@fakemail.com', '$2b$12$sdlVsjPPhgXU5GjFrzCx4OWe6xx5TYoIa9UbxrF93lM82g2.QhxwC'); -- password: password123
 
-INSERT OR IGNORE INTO users (username, email, password) VALUES ('Test User', 'testuser@fakemail.com', '$2b$12$sdlVsjPPhgXU5GjFrzCx4OWe6xx5TYoIa9UbxrF93lM82g2.QhxwC');
+INSERT OR IGNORE INTO accountSettings (userID, responseLength, displayMode, displayTextSize, displayFontStyle) VALUES 
+(1, 'Medium', 'Light', 'Medium', 'Arial');
 
-INSERT OR IGNORE INTO accountSettings (userID, responseLength, displayMode, displayTextSize, displayFontStyle) VALUES (1, 'Medium', 'Light', 'Medium', 'Arial');
+INSERT OR IGNORE INTO chatSession (userID, chatTitle, chatSubject, chatExplanationLevel) VALUES 
+(1, 'Sample Advanced Mathematics Chat', 'Mathematics', 'Advanced');
 
-INSERT OR IGNORE INTO chatSession (userID, chatTitle, chatSubject, chatExplanationLevel) VALUES (1, 'Sample Advanced Mathematics Chat', 'Mathematics', 'Advanced');
-
+INSERT OR IGNORE INTO messages (chatSessionID, sender, messageContent, messageConfidence, messageConfidenceReason) VALUES 
+(1, 'User', 'This is the first example prompt!', NULL, NULL),
+(1, 'TutorGPT', 'This is the first example response with a low confidence!', '3', 'Just cause it is.' ),
+(1, 'User', 'This is the second example prompt!', NULL, NULL),
+(1, 'TutorGPT', 'This is the first example response with a high confidence!', '10', NULL);

@@ -4,16 +4,20 @@ import { localStorageSettingsLoader, getUserInfo } from "../utility.jsx"
 
 
 async function handleLogin(email, password, setError, setPage) {
+    
+//This function checks for missing details? data? when trying to log in and checks if the user can log in, also sends an error message if user cant log in 
     if (!email || !password) {
         setError("Please fill all fields.")
         return;
     }
     const emailCheck = email.toLowerCase()
+
+    console.log(email,password)
     
         const res = await fetch("/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: emailCheck, password })
+            body: JSON.stringify({ email: emailCheck, password})
         })
 
         const data = await res.json()

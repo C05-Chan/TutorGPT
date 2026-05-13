@@ -1,79 +1,35 @@
 import { useState, useEffect } from "react"
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
+
+import { fetchCitations, fetchDocuments, fetchChatInfo } from "../utility";
 import ChatPromptBar from "../components/ChatPromptBar"
 import Citations from "../components/Citations"
 import ConfidenceFlag from "../components/ConfidenceFlag"
 
-async function fetchMessages(setMessages) {
-    if (localStorage.getItem("userID")) {
+async function fetchMessages(setMessages) { 
+
+    // this function gets the previous messages from database and displays it
+
+    if (localStorage.getItem("userID")) { // checks if its a logged in user
         const res = await fetch(`/api/getmessages?chatSessionID=${localStorage.getItem("chatSessionID")}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
+
         const data = await res.json()
         setMessages(data.messages || [])
+
+
     } else {
         const res = await fetch(`/api/getmessages?tempChatSessionID=${localStorage.getItem("tempChatSessionID")}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
+
         const data = await res.json()
         setMessages(data.messages || [])
     }
-}
-
-async function fetchChatInfo(setChatTitle) {
-    if (localStorage.getItem("userID")) {
-        const res = await fetch(`/api/getchatinfo?chatSessionID=${localStorage.getItem("chatSessionID")}`, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-        })
-
-        const data = await res.json()
-        setChatTitle(data.chatTitle)
-        console.log(data)
-        return data
-    } else {
-        const res = await fetch(`/api/gettempchatinfo?tempChatSessionID=${localStorage.getItem("tempChatSessionID")}`, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-        })
-
-        const data = await res.json()
-        setChatTitle(data.tempChatTitle)
-        
-        console.log(data)
-        return data
-    }
-}
-
-async function fetchDocuments(setUploadedDoc) {
-    if (!localStorage.getItem("userID")) return
-    const chatID = localStorage.getItem("chatSessionID")
-    const res = await fetch(`/api/getdocument?chatSessionID=${chatID}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-    })
-
-    const data = await res.json()
-    setUploadedDoc(data.documents[0] || null) 
-}
-
-async function fetchCitations(messageID, setSelectedCitations) {
-    console.log("fetchCitations called with messageID:", messageID)
-    const res = await fetch(`/api/getcitations?messageID=${messageID}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-    })
-    const data = await res.json()
-
-    if (!data.citations || data.citations.length === 0) {
-        setSelectedCitations(["empty"])  // special flag
-    } else {
-        setSelectedCitations(data.citations)
-    }
-    console.log("citations data:", data)
 }
 
 function ContinueChat() {
@@ -89,37 +45,37 @@ function ContinueChat() {
 
     }, [])
 
-    const pairs = []
+    const message_pairs = []
     for (let i = 0; i < messages.length; i += 2) {
-        pairs.push([messages[i], messages[i + 1]])
+        message_pairs.push([messages[i], messages[i + 1]])
     }
 
-    pairs.reverse()
+    message_pairs.reverse()
 
     let messagesList = []
-    for (let i = 0; i < pairs.length; i++) {
-        const userMsg = pairs[i][0]
-        const aiMsg = pairs[i][1]
+    for (let i = 0; i < message_pairs.length; i++) {
+        const user_messages = message_pairs[i][0]
+        const ai_messages = message_pairs[i][1]
 
-        if (userMsg) {
+        if (user_messages) {
             messagesList.push(
                 <div key={`user-${i}`} className="message-user">
                     <ReactMarkdown remarkPlugins={[remarkBreaks]}>
-                        {String(userMsg[2] || "")}
+                        {String(user_messages[2] || "")}
                     </ReactMarkdown>
                 </div>
             )
         }
 
-        if (aiMsg) {
+        if (ai_messages) {
             messagesList.push(
                 <div key={`ai-${i}`} className="message-ai">
                     <ReactMarkdown remarkPlugins={[remarkBreaks]}>
-                        {String(aiMsg[2] || "")}
+                        {String(ai_messages[2] || "")}
                     </ReactMarkdown>
 
-                    <ConfidenceFlag confidence={aiMsg[3]} />
-                    <button onClick={() => fetchCitations(aiMsg[0], setSelectedCitations)}>Show Sources</button>
+                    <ConfidenceFlag confidence={ai_messages[3]} />
+                    <button onClick={() => fetchCitations(ai_messages[0], setSelectedCitations)}>Show Sources</button>
                 </div>
             )
         }
@@ -158,6 +114,6 @@ function ContinueChat() {
                 </div>
             </div>
         )
-    }
+}
 
 export default ContinueChat

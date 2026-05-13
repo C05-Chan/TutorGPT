@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { TrashIcon }from "../components/Icons.jsx";
 
 async function fetchChats() {
+// This function fetches all chats associated with the user  
     const res = await fetch(`/api/getchats?user_id=${localStorage.getItem("userID")}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -13,7 +14,9 @@ async function fetchChats() {
     return data.chats;
 }
 
-async function fetchTempChats() {
+async function fetchTempChats() {   
+    
+// This function fetches a temporary chat for a guest user 
     const res = await fetch(`/api/gettempchatinfo?tempChatSessionID=${localStorage.getItem("tempChatSessionID")}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -26,7 +29,8 @@ async function fetchTempChats() {
 }  
 
 async function loadChats(setChats) {
-    console.log("loadChats called")
+// This function decides which fetch to use
+
     if (!localStorage.getItem("userID") && localStorage.getItem("tempChatSessionID")) {
         const chats = await fetchTempChats();
         console.log("fetched chats:", chats)
@@ -41,6 +45,8 @@ async function loadChats(setChats) {
 }
 
 async function deleteChat(chatSessionID, setChats) {
+    
+    // This function deletes the chat and refreshes it 
     console.log("deleteChat called", chatSessionID)
     
     if (!localStorage.getItem("userID")) {

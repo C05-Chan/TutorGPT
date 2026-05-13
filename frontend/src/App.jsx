@@ -36,8 +36,9 @@ function App() {
       {page === "signup" && <Signup setPage={setPage} />}
       {page === "resetpwd" && <ResetPassword setPage={setPage} />}
       {page === "newchatinfo"  && <NewChatInfo setPage={setPage} />}
-      {page === "continuechat" && <ContinueChat />}
       {page === "newchat" && <NewChat />}
+      {page === "continuechat" && <ContinueChat />}
+
     </>
   )
 }
