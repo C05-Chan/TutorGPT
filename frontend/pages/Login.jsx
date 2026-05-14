@@ -5,15 +5,15 @@ import { localStorageSettingsLoader, getUserInfo } from "../utility.jsx"
 
 async function handleLogin(email, password, setError, setPage) {
     
-//This function checks for missing details? data? when trying to log in and checks if the user can log in, also sends an error message if user cant log in 
+    //This function input validates and authenticates user can log in
+
     if (!email || !password) {
         setError("Please fill all fields.")
         return;
     }
-    const emailCheck = email.toLowerCase()
 
-    console.log(email,password)
-    
+    const emailCheck = email.toLowerCase() // changes the emails to lower case
+
         const res = await fetch("/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -23,9 +23,9 @@ async function handleLogin(email, password, setError, setPage) {
         const data = await res.json()
 
         if (data.success) {
-            const userID = await getUserInfo(emailCheck)
-            await localStorageSettingsLoader(userID)
-            setPage("home")
+            const userID = await getUserInfo(emailCheck) // get their ID and Username
+            await localStorageSettingsLoader(userID) // load their settings and add it to local storage
+            setPage("home") // take them to the home page if successfully logged in
 
         } else {
             setError("Unable to Login. Please check details")
@@ -34,10 +34,11 @@ async function handleLogin(email, password, setError, setPage) {
     }
 
 function Login({ setPage }) {
+
+    // hook components lets a component remember and update a value.which re-renders the component with the new value to update UI
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [error, setError] = useState("")
-
 
     return (
         <div className="login-container">

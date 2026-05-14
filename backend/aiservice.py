@@ -96,14 +96,14 @@ def call_ai(full_prompt, subject, level, response_length = 'Medium'):
     try: # tries calling Github model
         print("[AI] Trying GitHub model...")
         return call_github_model(full_prompt, subject, level, response_length) # if it works it calls the github model
-    except Exception: # catches any error
-        print("[AI] GitHub failed — switching to Gemini.")
+    except Exception as e:
+        print(f"[AI] Github failed — {e}")
 
     
     try: # tries calling Gemini fallback
         print("[AI] Trying Gemini fallback...")
         return call_gemini_model(full_prompt, subject, level, response_length) # if it works it calls the gemini model
-    except Exception: # catches any error
-        print("[AI] Gemini also failed")
+    except Exception as e:
+        print(f"[AI] Gemini also failed — {e}")
         return "The AI is currently unavailable. Please try again in a moment."
     

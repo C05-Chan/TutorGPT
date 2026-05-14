@@ -428,11 +428,10 @@ def submit_logged_prompt(data: dict = Body(...)):
     #    This calls and sends the prompt to the AI. Then it parses the response and saves into the database. This is for logged users    #
     #                                                                                                                                    #
     ######################################################################################################################################
-    
     prompt = data["prompt"] # user prompt
     chatSessionID = data["chatSessionID"] # chat session ID for the logged-in users to know where the messages are saved for which session in the database.
     response_length = data["responseLength"] 
-    confidence = ""
+    confidence_score = ""
     confidence_reason = ""
     citations = []
 
@@ -459,7 +458,7 @@ def submit_logged_prompt(data: dict = Body(...)):
             
         full_prompt = f"""
         Use this document as context (document name: {file[1]}): {document_context}
-        User question:{prompt}, and cite 1 or more relevant source [Remember: never give me a complete answers].
+        User question:{prompt}, and cite 1 or more relevant source. [Remember: never give me a complete answers].
         """ # this creates the user prompt and puts the documents content in that prompt too
     else:
         full_prompt = f"{prompt} , and cite 1 or more relevant sources [Remember: never give me a complete answers]." 
@@ -511,7 +510,7 @@ def submit_unlogged_prompt(data: dict = Body(...)):
     prompt = data["prompt"]
     tempChatSessionID = data["tempChatSessionID"]
     response_length = data["responseLength"]
-    confidence = ""
+    confidence_score = ""
     confidence_reason = ""
     citations = []
 
@@ -566,7 +565,7 @@ def submit_unlogged_prompt(data: dict = Body(...)):
     connection.commit()
     connection.close()
 
-    return {"success": True, "message": message_text, "confidence": confidence, "messageID": message_id}
+    return {"success": True, "message": message_text, "confidence": confidence_score, "messageID": message_id}
 
 #######################################
 #                                     #

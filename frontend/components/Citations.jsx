@@ -30,14 +30,15 @@ export default function Citations({citations}) {
         let citationLink = null
 
         if (c[2] === 'Uploaded Document') {
-            // checks if citation is a uploaded document or website
+            // checks if citation is a uploaded document 
+            const chatSessionID = localStorage.getItem("chatSessionID")
+            citationLink = <a href={`/api/getfile?chatSessionID=${chatSessionID}`} download>Download Document</a> // makes the link a downloadable file
 
-            citationLink = <a href={c[3]} download>Download Document</a>
         } else {
-            citationLink = <a href={c[3]} target="_blank">Visit Source</a>
+            citationLink = <a href={c[3]} target="_blank">Visit Source</a> // normal link
         }
 
-        citationList.push(
+        citationList.push( // add the citation container into the list 
             <div className='citation-container' key={i}>
                 <p className='citation-title'>{c[0]}:</p>
                 <p>{c[1]}</p>

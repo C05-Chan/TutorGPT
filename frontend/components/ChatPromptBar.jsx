@@ -49,6 +49,11 @@ async function handlePrompt(prompt, setError, timer, setLastSubmit, setPrompt, m
 
             setMessage(newMessagesAndResponse)
             // setLastSubmit(Date.now())
+        } else {
+            // pushes a placeholder ai message so the pairing logic always has a response for every user message
+            const newMessagesAndResponse = [...newMessages]
+            newMessagesAndResponse.push([null, "TutorGPT", "TutorGPT is unable to answer you right now. Please try again.", "1"])
+            setMessage(newMessagesAndResponse)
         }
     } else {
         const res = await fetch("/api/submitunloggedprompt", {
@@ -64,25 +69,32 @@ async function handlePrompt(prompt, setError, timer, setLastSubmit, setPrompt, m
             // console.log(data.message)
 
             const newMessagesAndResponse = [...newMessages]
-            newMessagesAndResponse.push([data.messageID, "TutorGPT", data.message, data.confidence])
-            
-            setMessage(newMessagesAndResponse)
+            newMessagesAndResponse.push([data.messageID, "TutorGPT", data.message, data.confidence]) // adds AI response to message list
+
+            setMessage(newMessagesAndResponse) // sets the new messages with the response
             // setLastSubmit(Date.now())
+        } else {
+            // pushes a placeholder ai message so the pairing logic always has a response for every user message
+            const newMessagesAndResponse = [...newMessages]
+            newMessagesAndResponse.push([null, "TutorGPT", "TutorGPT is unable to answer you right now. Please try again.", "1"])
+            setMessage(newMessagesAndResponse)
         }
     }
 }
 
 export default function ChatPromptBar({messages, setMessage}) {
 
-    // This is a input box where the user can type in a prompt to send to the ai service.
-
-    const [prompt, setPrompt] = useState("")
+    // This is a input box where the user can type in a prompt to send to the ai service
+    
+    // hook components which re-renders the component with the new value to update UI
+    const [prompt, setPrompt] = useState("") 
     const [error, setError] = useState("")
     const [lastSubmit, setLastSubmit] = useState(null)
 
     return (
         <div className="chat-prompt-container">
             <div className="chat-prompt-bar">
+                {/* the prompt bar where the user inputs topic */}
                 <input
                     value={prompt}
                     onChange={(event) => setPrompt(event.target.value)}

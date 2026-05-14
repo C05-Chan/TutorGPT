@@ -3,15 +3,17 @@ import ErrorPopup from "../components/ErrorMessage.jsx"
 import FileUploader  from "../components/FileUploader.jsx";
 
 async function uploadDocument(file, setError) {
-    const formData = new FormData()
+
+    // this function sends the form to the database
+
+    const formData = new FormData() // builds the form data to send the file and chat session ID to the server
     formData.append("file", file)
     formData.append("chatSessionID", localStorage.getItem("chatSessionID"))
 
     const res = await fetch("/api/uploaddocument", {
         method: "POST",
-        body: formData 
+        body: formData // sends as form data instead of JSON since it contains a file
     })
-
     const data = await res.json()
 
     if (data.success) {
@@ -20,28 +22,31 @@ async function uploadDocument(file, setError) {
         console.log("Unable to upload doc.", data)  
         setError(data.message)
     }
-
 }
 
 async function handleCreate(title, subject, level, setError, setPage, fileSelected) {
+
+    // this function creates the chat after input validation are passed
+
+    // validates that all required fields are filled in before creating a chat
     if (!title || !subject || !level) {
         console.log("Please fill in all fields.", title, subject)
         return setError("Please fill in all fields.");
     }
 
-    if (!localStorage.getItem("userID")) {
+    if (!localStorage.getItem("userID")) { // creates a temporary chat session for users who are not logged in
+        
         const res = await fetch("/api/createtempchat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ tempChatTitle: title, tempChatSubject: subject, tempChatExplanationLevel: level })
             })
-
             const data = await res.json()
-
             if (data.success) {
                 setPage("newchat")
                 console.log("Chat created successfully with title:", title, "and subject:", subject, "and level:", level)
-                localStorage.setItem("tempChatSessionID", 1)
+                localStorage.setItem("tempChatSessionID", 1) // stores the temp chat session ID in local storage (always id 1 as the table deletes and creates a new row on new creation of temporary cahat)
+
             } else {
                 setError(data.message)
                 console.error("Chat creation failed:", data.message)
@@ -49,23 +54,22 @@ async function handleCreate(title, subject, level, setError, setPage, fileSelect
         return;
     }
 
+    // creates a permanent chat session for logged in users
     const userID = localStorage.getItem("userID")
     const res = await fetch("/api/createchat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userID: userID, chatTitle: title, chatSubject: subject, chatExplanationLevel: level })
     })
-
     const data = await res.json()
 
     if (data.success) {
-        localStorage.setItem("chatSessionID", data.chatSessionID )
+        localStorage.setItem("chatSessionID", data.chatSessionID) // stores the chat session ID in local storage
         console.log("Chat created successfully with title:", title, "and subject:", subject, "and level:", level)
 
         if (fileSelected) {
-            await uploadDocument(fileSelected, setError)
+            await uploadDocument(fileSelected, setError) // uploads the document if one was selected
         }
-
         setPage("newchat")
     } else {
         setError(data.message)
@@ -74,24 +78,25 @@ async function handleCreate(title, subject, level, setError, setPage, fileSelect
 }
 
 function NewChatInfo({setPage}) {
+
+    // hook components which re-renders the component with the new value to update UI
     const [title, setTitle] = useState("")
-    const [subject, setSubject] = useState("Computer Science")
-    const [level, setExplanationLevel] = useState("Beginner")
+    const [subject, setSubject] = useState("Computer Science") // Default computer science
+    const [level, setExplanationLevel] = useState("Beginner") // Default beginner
     const [error, setError] = useState("")
     const [fileSelected, setFileSelected] = useState(null)
 
     if (localStorage.getItem("userID")) {
+        
+        // renders the logged in version of the form which includes the file uploader
         return (
             <div className="chat-info-container">
                 <h2>New Chat</h2>
-
                 {error && <ErrorPopup message={error} />}
-
                 <div className="chat-info-feature">
                     <label>Title</label>
                     <input onChange={(event) => setTitle(event.target.value)} />
                 </div>
-
                 <div className="chat-info-feature">
                     <label>Subject</label>
                     <select onChange={(event) => setSubject(event.target.value)} value={subject}>
@@ -99,7 +104,6 @@ function NewChatInfo({setPage}) {
                         <option value="Mathematics">Mathematics</option>
                     </select>
                 </div>
-
                 <div className="chat-info-feature">
                     <label>Explanation Level</label>
                     <select onChange={(event) => setExplanationLevel(event.target.value)} value={level}>
@@ -109,28 +113,24 @@ function NewChatInfo({setPage}) {
                         <option value="Expert">Expert</option>
                     </select>
                 </div>
-
                 <div className="chat-info-feature">
                     <label>Add a File</label>
                     <FileUploader fileSelected={fileSelected} setFileSelected={setFileSelected} setError={setError} />
                 </div>
-
                 <button onClick={() => handleCreate(title, subject, level, setError, setPage, fileSelected)}>Create Chat</button>
             </div>
         )
     }
 
+    // renders the guest version of the form without the file uploader
     return (
         <div className="chat-info-container">
             <h2>New Chat</h2>
-
             {error && <ErrorPopup message={error} />}
-
             <div className="chat-info-feature">
                 <label>Title:</label>
                 <input onChange={(event) => setTitle(event.target.value)} />
             </div>
-
             <div className="chat-info-feature">
                 <label>Subject:</label>
                 <select onChange={(event) => setSubject(event.target.value)} value={subject}>
@@ -138,7 +138,6 @@ function NewChatInfo({setPage}) {
                     <option value="Mathematics">Mathematics</option>
                 </select>
             </div>
-
             <div className="chat-info-feature">
                 <label>Explanation Level:</label>
                 <select onChange={(event) => setExplanationLevel(event.target.value)} value={level}>
@@ -148,7 +147,6 @@ function NewChatInfo({setPage}) {
                     <option value="Expert">Expert</option>
                 </select>
             </div>
-
             <button onClick={() => handleCreate(title, subject, level, setError, setPage)}>Create Chat</button>
             <p>Make an account to add a file!</p>
         </div>

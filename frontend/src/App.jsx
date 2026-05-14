@@ -16,10 +16,10 @@ import NewChat from "../pages/NewChat.jsx"
 import ContinueChat from "../pages/ContinueChat.jsx"
 
 function App() {
-  const [page, setPage] = useState("home")
+  const [page, setPage] = useState("home") // tracks which page is currently displayed
 
-  // Apply the user's saved visual settings as soon as the app loads
   useEffect(() => {
+    // applies the user's saved visual settings as soon as the app loads
     const displayMode = localStorage.getItem("displayMode") || "Light"
     const displayTextSize = localStorage.getItem("displayTextSize") || "Medium"
     const displayFontStyle = localStorage.getItem("displayFontStyle") || "Arial"
@@ -30,6 +30,7 @@ function App() {
     <>
       <TopNavbar setPage={setPage} />
 
+      {/* conditionally renders the current page based on the page state */}
       {page === "home" && <Home setPage={setPage} />}
       {page === "settings" && <Settings setPage={setPage} />}
       {page === "login" && <Login setPage={setPage} />}
@@ -38,7 +39,6 @@ function App() {
       {page === "newchatinfo"  && <NewChatInfo setPage={setPage} />}
       {page === "newchat" && <NewChat />}
       {page === "continuechat" && <ContinueChat />}
-
     </>
   )
 }

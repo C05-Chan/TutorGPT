@@ -10,6 +10,7 @@ import ConfidenceFlag from "../components/ConfidenceFlag"
 
 function NewChat() {
 
+    // hook components lets a component remember and update a value.which re-renders the component with the new value to update UI
     const [chatTitle, setChatTitle] = useState("")
     const [messages, setMessage] = useState([])
     const [uploadedDoc, setUploadedDoc] = useState(null)
@@ -18,45 +19,49 @@ function NewChat() {
     useEffect(() => {
         fetchChatInfo(setChatTitle)
         fetchDocuments(setUploadedDoc)
-    }, [])
+    }, []) // runs code inside after the component renders, [] means it runs once when the component first loads
 
+    // groups messages into pairs of [user, ai] since they are stored flat in the array
     const message_pairs = []
     for (let i = 0; i < messages.length; i += 2) {
-        message_pairs.push([messages[i], messages[i + 1]])
+        message_pairs.push([messages[i], messages[i + 1]]) // builds the message_pair array of messages by pairing them
     }
     
-    message_pairs.reverse()
+    message_pairs.reverse() // reverses so the most recent messages appear at the top
 
     let messagesList = []
-    for (let i = 0; i < message_pairs.length; i++) {
-        const userMsg = message_pairs[i][0]
-        const aiMsg = message_pairs[i][1]
+    for (let i = 0; i < message_pairs.length; i++) { // builds the list of message components to render, for ever item in the message_pairs
 
-        if (userMsg) {
+        const user_messages = message_pairs[i][0] // user message is the first item of the message pair item
+        const ai_response = message_pairs[i][1] // ai response is the first item of the message pair item
+
+        if (user_messages) { // renders the user message if it exists
             messagesList.push(
                 <div key={`user-${i}`} className="message-user">
                     <ReactMarkdown remarkPlugins={[remarkBreaks]}>
-                        {String(userMsg[2] || "")}
+                        {String(user_messages[2] || "")}
                     </ReactMarkdown>
                 </div>
             )
         }
 
-        if (aiMsg) {
+        if (ai_response) { // renders the ai message if it exists, along with confidence flag and show sources button
             messagesList.push(
                 <div key={`ai-${i}`} className="message-ai">
                     <ReactMarkdown remarkPlugins={[remarkBreaks]}>
-                        {String(aiMsg[2] || "")}
+                        {String(ai_response[2] || "")}
                     </ReactMarkdown>
 
-                    <ConfidenceFlag confidence={aiMsg[3]} />
-                    <button onClick={() => fetchCitations(aiMsg[0], setSelectedCitations)}>Show Sources</button>
+                    <div className="confidence-citations">
+                        <button onClick={() => fetchCitations(ai_response[0], setSelectedCitations)}>Show Sources</button>
+                        <ConfidenceFlag confidence={ai_response[3]} />
+                    </div>
                 </div>
             )
         }
     }
 
-    if (uploadedDoc) {
+    if (uploadedDoc) { // if an uploaded document is associated with the chat, show a download link for it
         return (
             <div className="chat-layout">
                 <div className="chat-sidebar">
