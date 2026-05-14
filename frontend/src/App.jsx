@@ -12,8 +12,7 @@ import Login from "../pages/Login.jsx"
 import Signup from "../pages/Signup.jsx"
 import ResetPassword from "../pages/ResetPwd.jsx"
 import NewChatInfo from "../pages/NewChatInfo.jsx"
-import NewChat from "../pages/NewChat.jsx"
-import ContinueChat from "../pages/ContinueChat.jsx"
+import ChatView from "../pages/ChatPage.jsx"
 
 function App() {
   const [page, setPage] = useState("home") // tracks which page is currently displayed
@@ -37,8 +36,8 @@ function App() {
       {page === "signup" && <Signup setPage={setPage} />}
       {page === "resetpwd" && <ResetPassword setPage={setPage} />}
       {page === "newchatinfo"  && <NewChatInfo setPage={setPage} />}
-      {page === "newchat" && <NewChat />}
-      {page === "continuechat" && <ContinueChat />}
+      {page === "newchat" && <ChatView isContinuedChat={false} />}
+      {page === "continuechat" && <ChatView isContinuedChat={true}/>}
     </>
   )
 }

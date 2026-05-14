@@ -24,6 +24,21 @@ You must install **Microsoft C++ Build Tools** once before running the setup:
 
 You only need to do this once on your machine.
 
+## API Keys 
+
+This app uses two AI services:
+> Both keys are free to use within their rate limits.
+
+- **GitHub Models (GPT-4o mini)** — Primary AI
+  - Requires a GitHub account
+  - Get your token at: https://github.com/settings/tokens
+  - The token needs the **"models:read"** permission
+
+- **Google Gemini (gemini-2.5-flash)** — Fallback AI (used if GitHub fails)
+  - Requires a Google account
+  - Get your API key at: https://aistudio.google.com/app/apikey
+
+
 ---
 ## Installation
 
@@ -44,7 +59,7 @@ Install all dependencies:
 
 Run this command first regardless of the machine/ OS:
 ``` 
-    npm install 
+npm install 
 ```
 
 **Mac:**
