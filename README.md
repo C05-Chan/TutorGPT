@@ -16,8 +16,6 @@ You must install **Microsoft C++ Build Tools** once before running the setup:
 2. Download and run `vs_BuildTools.exe`
 3. Tick **"Desktop development with C++"**
 
-
-
 ![alt text](screenshot_installation.png)
 
 
@@ -27,17 +25,27 @@ You must install **Microsoft C++ Build Tools** once before running the setup:
 You only need to do this once on your machine.
 
 ---
-
 ## Installation
 
-Clone the repository:
-
+**Option 1 — Clone with Git:**
 ```bash
 git clone https://github.com/C05-Chan/TutorGPT.git
 cd TutorGPT
 ```
 
+**Option 2 — Download ZIP (no Git required):**
+1. Go to https://github.com/C05-Chan/TutorGPT
+2. Click the green **"Code"** button
+3. Click **"Download ZIP"**
+4. Extract the ZIP file4
+5. Open a terminal inside the extracted folder
+
 Install all dependencies:
+
+Run this command first regardless of the machine/ OS:
+``` 
+    npm install 
+```
 
 **Mac:**
 ```bash

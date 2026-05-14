@@ -3,26 +3,32 @@ import ErrorPopup from "../components/ErrorMessage.jsx"
 import { SendIcon } from "./Icons.jsx"
 
 async function handlePrompt(prompt, setError, timer, setLastSubmit, setPrompt, messages, setMessage) {
+
+    // This function handles the prompt that is sent by validating in the input, check character amount and time limit before sending it to the server to be processed
+
+    let submitTime = Date.now()
+
     if (!prompt) {
         return setError("Please enter a prompt.")
 
     } else if (prompt.length > 100) {
         return setError("Prompt is too long. Please enter a prompt less than 100 characters.")
 
-    } else if (timer && Date.now() - timer < 30000) { // This checks if last prompt was sent less than 30 seconds ago.
-        /// 6000 for a minute 
-        const secondsLeft = ((30000 - (Date.now() - timer)) / 1000) | 0
+    } else if (timer && submitTime - timer < 30000) { // This checks if last prompt was sent less than 30 seconds ago.
+        /// 60000 for a minute 
+        const secondsLeft = Math.floor((30000 - (submitTime - timer)) / 1000) // this calculates how many seconds left before user can send another prompt
         return setError(`Please wait ${secondsLeft} seconds before sending another prompt.`)
 
     } else {
         setError("")
     }
 
-    const newMessages = [...messages]
-    newMessages.push([null, "User", prompt, null])
+    const newMessages = [...messages] // stored previous messages
+    newMessages.push([null, "User", prompt, null])  // added user's prompt into the messages for display
+
     setMessage(newMessages)
     setPrompt("")
-    setLastSubmit(Date.now())
+    setLastSubmit(submitTime) // sets the submitTime
 
     const responseLength = localStorage.getItem("responseLength")
     
@@ -37,8 +43,10 @@ async function handlePrompt(prompt, setError, timer, setLastSubmit, setPrompt, m
 
         if (data.success) {
             console.log("Prompt submitted successfully:", prompt)
-            const newMessagesAndResponse = [...newMessages]
+            
+            const newMessagesAndResponse = [...newMessages] // stored previous messages including the users' prompt
             newMessagesAndResponse.push([data.messageID, "TutorGPT", data.message, data.confidence])
+
             setMessage(newMessagesAndResponse)
             // setLastSubmit(Date.now())
         }
@@ -53,9 +61,11 @@ async function handlePrompt(prompt, setError, timer, setLastSubmit, setPrompt, m
 
         if (data.success) {
             console.log("Prompt submitted successfully:", prompt)
-            console.log(data.message)
+            // console.log(data.message)
+
             const newMessagesAndResponse = [...newMessages]
             newMessagesAndResponse.push([data.messageID, "TutorGPT", data.message, data.confidence])
+            
             setMessage(newMessagesAndResponse)
             // setLastSubmit(Date.now())
         }
@@ -63,6 +73,9 @@ async function handlePrompt(prompt, setError, timer, setLastSubmit, setPrompt, m
 }
 
 export default function ChatPromptBar({messages, setMessage}) {
+
+    // This is a input box where the user can type in a prompt to send to the ai service.
+
     const [prompt, setPrompt] = useState("")
     const [error, setError] = useState("")
     const [lastSubmit, setLastSubmit] = useState(null)

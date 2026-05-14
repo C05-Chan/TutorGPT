@@ -5,6 +5,8 @@ export default function ConfidenceFlag({ confidence }) {
     // console.log(score)
     
     if (score >= 8) {
+        // if the confidence score is higher than 8
+        
         return (
             <span className="high-confidence"><FlagIcon/></span>
         )
