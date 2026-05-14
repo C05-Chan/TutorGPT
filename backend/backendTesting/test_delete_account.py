@@ -24,4 +24,19 @@ def test_deleted_account_cannot_login(client):
         "email": "deleteme@test.com",
         "password": "temppassword"
     })
-    assert response.json()["error"] == True
+    assert response.json()["success"] == False
+
+def test_full_delete_clears_everything(client):
+    # Integration: delete → email gone → login fails
+    client.post("/api/signup", json={
+        "username": "Delete Flow User",
+        "email": "deleteflow@test.com",
+        "password": "password123"
+    })
+    user_id = client.get("/api/userinfo", params={"email": "deleteflow@test.com"}).json()["userID"]
+    client.post("/api/deleteaccount", json={"userID": user_id})
+
+    assert client.get("/api/emailcheck", params={"email": "deleteflow@test.com"}).json()["exists"] == False
+    assert client.post("/api/login", json={
+        "email": "deleteflow@test.com", "password": "password123"
+    }).json()["success"] == False

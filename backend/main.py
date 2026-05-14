@@ -60,7 +60,7 @@ def save_citations(cursor, citations, message_id, file=None, chatSessionID=None)
     for c in citations: # for every citation in the array
         source = c["source"].strip().lower() # this makes the source (e.g external or uploaded document) to have no spaces behind or infront of the word and forces lowercase.
 
-        if source == "external" or source == "external source": # check source type
+        if source != "uploaded document" and source != "uploaded": # check source type
             source = "External Source" # relabels to be consistent with the database
 
             cursor.execute("INSERT OR IGNORE INTO citations (citationSource, citationName, citationText, citationURL) VALUES (?, ?, ?, ?)", (source, c["name"], c["text"], c["url"])) # added or ignores this citation row to the database

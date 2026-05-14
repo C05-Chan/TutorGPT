@@ -44,3 +44,17 @@ def test_signup_then_login(client):
     })
     data = response.json()
     assert data["success"] == True
+    
+
+def test_full_signup_to_login_flow(client):
+    # Integration: sign up then immediately log in
+    client.post("/api/signup", json={
+        "username": "Integration User",
+        "email": "integration@test.com",
+        "password": "password123"
+    })
+    response = client.post("/api/login", json={
+        "email": "integration@test.com",
+        "password": "password123"
+    })
+    assert response.json()["success"] == True

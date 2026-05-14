@@ -1,4 +1,4 @@
-import { applySettingsOnLoad } from "./src/applySettings"
+import { applySettingsOnLoad } from "./applySettings"
 
 export async function localStorageSettingsLoader(userID) {
 

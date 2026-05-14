@@ -3,16 +3,16 @@ import "./App.css"
 import { applySettingsOnLoad } from "./applySettings"
 
 // Components
-import TopNavbar from "../components/TopNavbar.jsx"
+import TopNavbar from "./components/TopNavbar.jsx"
 
 // Pages
-import Home from "../pages/Home.jsx"
-import Settings from "../pages/Settings.jsx"
-import Login from "../pages/Login.jsx"
-import Signup from "../pages/Signup.jsx"
-import ResetPassword from "../pages/ResetPwd.jsx"
-import NewChatInfo from "../pages/NewChatInfo.jsx"
-import ChatView from "../pages/ChatPage.jsx"
+import Home from "./pages/Home.jsx"
+import Settings from "./pages/Settings.jsx"
+import Login from "./pages/Login.jsx"
+import Signup from "./pages/Signup.jsx"
+import ResetPassword from "./pages/ResetPwd.jsx"
+import NewChatInfo from "./pages/NewChatInfo.jsx"
+import ChatView from "./pages/ChatPage.jsx"
 
 function App() {
   const [page, setPage] = useState("home") // tracks which page is currently displayed

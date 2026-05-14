@@ -18,7 +18,7 @@ def test_login_wrong_password(client):
         "password": "wrongpassword"
     })
     data = response.json()
-    assert data["error"] == True
+    assert data["success"] == False
 
 def test_login_nonexistent_email(client):
     response = client.post("/api/login", json={
@@ -26,7 +26,7 @@ def test_login_nonexistent_email(client):
         "password": TEST_PASSWORD
     })
     data = response.json()
-    assert data["error"] == True
+    assert data["success"] == False
 
 def test_login_email_case_insensitive(client):
     response = client.post("/api/login", json={
@@ -34,3 +34,11 @@ def test_login_email_case_insensitive(client):
         "password": TEST_PASSWORD
     })
     assert response.status_code == 200
+    
+def test_login_email_case_insensitive_regression(client):
+    # Regression: uppercase email must always work
+    response = client.post("/api/login", json={
+        "email": "TESTUSER@FAKEMAIL.COM",
+        "password": TEST_PASSWORD
+    })
+    assert response.json()["success"] == True
