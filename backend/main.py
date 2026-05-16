@@ -297,7 +297,7 @@ def get_chats(user_id: int):
     connection = get_connection()
     cursor = connection.cursor()
     
-    cursor.execute("SELECT chatSessionID, chatTitle, chatCreateDate FROM chatSession WHERE userID = ?", (user_id,))
+    cursor.execute("SELECT chatSessionID, chatTitle, chatCreateDate FROM chatSession WHERE userID = ? ORDER BY chatCreateDate DESC", (user_id,))
     
     chats = cursor.fetchall()
     connection.close()
@@ -441,7 +441,6 @@ def submit_logged_prompt(data: dict = Body(...)):
     cursor.execute("SELECT chatSubject, chatExplanationLevel FROM chatSession WHERE chatSessionID = ?", (chatSessionID,))
     
     chat_info = cursor.fetchone() # this only gets one row of data back.
-    
     if chat_info is None: # this check if any chat information with the chat session ID was found or not.
         connection.close()
         return {"success": False, "message": "Chat session not found."}
