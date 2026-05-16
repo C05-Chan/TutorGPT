@@ -36,6 +36,7 @@ export default function useSettings() {
         localStorage.setItem("displayFontStyle", displayFontStyle)
 
         applySettingsOnLoad(displayMode, displayTextSize, displayFontStyle)
+        setError("Settings Saved!")
 
         if (userID && userID !== "null") {
             const res = await fetch("/api/updateSettings", {
@@ -46,6 +47,7 @@ export default function useSettings() {
             const data = await res.json()
             if (data.success) {
                 await localStorageSettingsLoader(userID)
+                setError("Settings Saved!")
             } else {
                 setError("Failed to save settings.")  // tell the user something went wrong
             }

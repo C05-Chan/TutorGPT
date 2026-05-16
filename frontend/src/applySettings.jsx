@@ -25,7 +25,7 @@ export function applySettingsOnLoad(displayMode, displayTextSize, displayFontSty
         Medium: "16px",
         Large: "21px",
     };
-    root.style.setProperty("--font-size", sizeMap[displayTextSize] || "16px");
+    root.style.setProperty("--font-size", sizeMap[displayTextSize] || "16px"); // set the font size to the selected displayTextSize or default to 16px
     
     // maps setting values to CSS font families and applies the matching font
     const fontMap = {
@@ -33,5 +33,5 @@ export function applySettingsOnLoad(displayMode, displayTextSize, displayFontSty
         "Times New Roman": "'Times New Roman', Times, serif",
         "Courier New": "'Courier New', Courier, monospace", 
     };
-    root.style.setProperty("--font-family", fontMap[displayFontStyle] || "Arial, sans-serif");
+    root.style.setProperty("--font-family", fontMap[displayFontStyle] || "Arial, sans-serif"); // set the font to the selected displayFontStyle or default to Arial
 }
