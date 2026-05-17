@@ -748,4 +748,3 @@ def delete_account(data: dict = Body(...)):
     connection.close()
     
     return {"success": True, "message":"Account deleted"}
-

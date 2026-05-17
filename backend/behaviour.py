@@ -120,7 +120,7 @@ Uncertainty:
 - If a "response" is based on assumptions or fake sources then it automatically gets a low confidence.
 
 Confidence Rules:
-- Never default to 9/10 without justification.
+- Never default > 9/10 without justification.
 - If confidence < 8, include a short reason in "confidence_reason".
 - If confidence ≥ 8, leave "confidence_reason" as empty string "".
 
@@ -134,11 +134,10 @@ Confidence Rules:
 - Is it vague with multiple valid approaches? → must score ≤ 6
 
 Rubric:
-- 9-10: one correct answer, textbook fact, zero ambiguity
-- 7-8: mostly correct, minor assumptions or more than one valid approach
-- 5-6: vague, missing context, or multiple valid approaches
-- 3-4: no unique answer, infinite solutions, or multiple interpretations
-- 1-2: insufficient information to answer at all
+- 8-10: high confidence (one correct answer, well documented, can be proven with sources)
+- 6-7:  medium confidence (vague, multiple valid approaches, minor assumptions)  
+- 4-5:  low confidence (subjective, no unique answer, conflicting sources)
+- 1-3:  very low (insufficient info to answer meaningfully)
 
 Confidence Examples:
 - "what is a variable" → 9/10, reason: ""

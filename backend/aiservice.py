@@ -12,21 +12,22 @@ from google.genai import types
 from behaviour import TUTOR_PROMPT
 
 def build_system_prompt(subject, level, response_length):
-#################################################################################################
-#                                                                                               #
-#       Builds the system prompt to provide context and rules for the behaviour of the AI       #
-#                                                                                               #
-#################################################################################################
+    #########################################################################################
+    #                                                                                       #
+    #   Builds the system prompt to provide context and rules for the behaviour of the AI   #
+    #                                                                                       #
+    #########################################################################################
+    
     built_system_prompt = TUTOR_PROMPT.replace("{subject}", subject).replace("{level}", level).replace("{response_length}", response_length) # this formats the TUTOR_PROMPT in behaviour.py
     
     return built_system_prompt
 
 def call_github_model(full_prompt, subject, level, response_length):
-##############################################################################################################################
-#                                                                                                                            #
-#       This send a prompt and receives a response from the github model which uses OpenAI gpt-4o-mini. Main AI model.       #
-#                                                                                                                            #
-##############################################################################################################################
+    ######################################################################################################################
+    #                                                                                                                    #
+    #   This send a prompt and receives a response from the github model which uses OpenAI gpt-4o-mini. Main AI model.   #
+    #                                                                                                                    #
+    ######################################################################################################################
 
     token = os.environ["GITHUB_API_TOKEN"] # gets the API token from an environment variable
     endpoint = "https://models.github.ai/inference" # where request is sent to
@@ -39,7 +40,7 @@ def call_github_model(full_prompt, subject, level, response_length):
 
     system_prompt = build_system_prompt(subject, level, response_length)
 
-    response = client.chat.completions.create(  #this sends request to the model
+    response = client.chat.completions.create (
         messages = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": full_prompt}
@@ -60,11 +61,11 @@ def call_github_model(full_prompt, subject, level, response_length):
     return response.choices[0].message.content
 
 def call_gemini_model(full_prompt, subject, level, response_length):
-#################################################################################################################################
-#                                                                                                                               #
-#       This send a prompt and receives a response from the google model which uses gemini-2.5-flash. Secondary AI model.       #
-#                                                                                                                               #
-#################################################################################################################################
+    #########################################################################################################################
+    #                                                                                                                       #
+    #   This send a prompt and receives a response from the google model which uses gemini-2.5-flash. Secondary AI model.   #
+    #                                                                                                                       #
+    #########################################################################################################################
 
     api_key = os.environ["GEMINI_API_KEY"] # gets the API key from an environment variable
     client = genai.Client(api_key=api_key)
@@ -86,24 +87,25 @@ def call_gemini_model(full_prompt, subject, level, response_length):
     return response.text
 
 def call_ai(full_prompt, subject, level, response_length = 'Medium'):
-##################################################################################################
-#                                                                                                #
-#       This calls the AI modules:                                                               #
-#           - Tries GitHub (gpt-4o-mini) first.                                                  #
-#           - Falls back to Gemini (gemini-2.5-flash) if GitHub fails or hits rate/token limits. #
-#                                                                                                #
-##################################################################################################
+    ##########################################################################################
+    #                                                                                        #
+    #   This calls the AI modules:                                                           #
+    #   - Tries GitHub (gpt-4o-mini) first.                                                  #
+    #   - Falls back to Gemini (gemini-2.5-flash) if GitHub fails or hits rate/token limits. #
+    #                                                                                        #
+    ##########################################################################################
+    
     try: # tries calling Github model
         print("[AI] Trying GitHub model...")
         return call_github_model(full_prompt, subject, level, response_length) # if it works it calls the github model
-    except Exception as e:
-        print(f"[AI] Github failed — {e}")
+    except Exception as explain: # catches any error
+        print(f"[AI] GitHub failed - {explain} — switching to Gemini.")
 
     
     try: # tries calling Gemini fallback
         print("[AI] Trying Gemini fallback...")
         return call_gemini_model(full_prompt, subject, level, response_length) # if it works it calls the gemini model
-    except Exception as e:
-        print(f"[AI] Gemini also failed — {e}")
+    except Exception as explain: # catches any error
+        print(f"[AI] Gemini also failed - {explain}")
         return "The AI is currently unavailable. Please try again in a moment."
     
