@@ -457,10 +457,10 @@ def submit_logged_prompt(data: dict = Body(...)):
             
         full_prompt = f"""
         Use this document as context (document name: {file[1]}): {document_context}
-        User question:{prompt}, and cite 1 or more relevant source. [Remember: never give me a complete answers].
+        User question:{prompt}, and cite all your sources. [Remember: never give me a complete answers].
         """ # this creates the user prompt and puts the documents content in that prompt too
     else:
-        full_prompt = f"{prompt} , and cite 1 or more relevant sources [Remember: never give me a complete answers]." 
+        full_prompt = f"{prompt} , and cite all your sources [Remember: never give me a complete answers]." 
 
     ai_response = call_ai(full_prompt, subject=subject, level=level, response_length=response_length) # calls the ai service and gives the settings to format the system prompt
     
@@ -527,7 +527,7 @@ def submit_unlogged_prompt(data: dict = Body(...)):
     subject = chat_info[0]
     level = chat_info[1]
     
-    full_prompt = f"{prompt}, and cite at least 1 source."
+    full_prompt = f"{prompt}, and cite all your sources. [Remember: never give me a complete answers]"
 
     ai_response = call_ai(full_prompt, subject=subject, level=level, response_length=response_length)
     
