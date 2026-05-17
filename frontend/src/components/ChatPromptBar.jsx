@@ -45,14 +45,14 @@ async function handlePrompt(prompt, setError, timer, setLastSubmit, setPrompt, m
             console.log("Prompt submitted successfully:", prompt)
             
             const newMessagesAndResponse = [...newMessages] // stored previous messages including the users' prompt
-            newMessagesAndResponse.push([data.messageID, "TutorGPT", data.message, data.confidence])
+            newMessagesAndResponse.push([data.messageID, "TutorGPT", data.message, data.confidence, data.confidenceReason])
 
             setMessage(newMessagesAndResponse)
             // setLastSubmit(Date.now())
         } else {
             // pushes a placeholder ai message so the pairing logic always has a response for every user message
             const newMessagesAndResponse = [...newMessages]
-            newMessagesAndResponse.push([null, "TutorGPT", "TutorGPT is unable to answer you right now. Please try again.", "1"])
+            newMessagesAndResponse.push([null, "TutorGPT", "TutorGPT is unable to answer you right now. Please try again.", "10", null])
             setMessage(newMessagesAndResponse)
         }
     } else {
@@ -69,14 +69,15 @@ async function handlePrompt(prompt, setError, timer, setLastSubmit, setPrompt, m
             // console.log(data.message)
 
             const newMessagesAndResponse = [...newMessages]
-            newMessagesAndResponse.push([data.messageID, "TutorGPT", data.message, data.confidence]) // adds AI response to message list
+            newMessagesAndResponse.push([data.messageID, "TutorGPT", data.message, data.confidence, data.confidenceReason])
+ // adds AI response to message list
 
             setMessage(newMessagesAndResponse) // sets the new messages with the response
             // setLastSubmit(Date.now())
         } else {
             // pushes a placeholder ai message so the pairing logic always has a response for every user message
             const newMessagesAndResponse = [...newMessages]
-            newMessagesAndResponse.push([null, "TutorGPT", "TutorGPT is unable to answer you right now. Please try again.", "1"])
+            newMessagesAndResponse.push([null, "TutorGPT", "TutorGPT is unable to answer you right now. Please try again.", "10", null])
             setMessage(newMessagesAndResponse)
         }
     }

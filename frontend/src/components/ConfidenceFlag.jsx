@@ -1,8 +1,7 @@
 import { FlagIcon, FlagWarningIcon } from "./Icons.jsx"
 
-export default function ConfidenceFlag({ confidence }) {
-    console.log("confidence value:", confidence, typeof confidence)  
-
+export default function ConfidenceFlag({ confidence, confidenceReason  }) { 
+    console.log("confidence:", confidence, "confidenceReason:", confidenceReason)
     const score = parseInt(confidence) // this changes confidence to an integer
     // console.log(score)
     
@@ -14,7 +13,7 @@ export default function ConfidenceFlag({ confidence }) {
     } else {
 
         return (
-            <span className="low-confidence"><FlagWarningIcon/> Response confidence is low! Advise to do more research.</span>
+            <span className="low-confidence"><FlagWarningIcon/> Response confidence is low! {confidenceReason || "Advise to do more research."}</span>
         )
     }
 }

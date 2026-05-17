@@ -54,40 +54,41 @@ function ChatView({ isContinuedChat }) {
     }, [])  // runs code inside after the component renders, [] means it runs once when the component first loads
 
     // groups messages into pairs of [user, ai] since they are stored flat in the array
-    const message_pairs = [] 
+    const messagePairs = [] 
     for (let i = 0; i < messages.length; i += 2) {
-        message_pairs.push([messages[i], messages[i + 1]]) // builds the message_pair array of messages by pairing them
+        messagePairs.push([messages[i], messages[i + 1]]) // builds the message_pair array of messages by pairing them
     }
 
-    message_pairs.reverse()  // reverses so the most recent messages appear at the top
+    messagePairs.reverse()  // reverses so the most recent messages appear at the top
     
     let messagesList = []
-    for (let i = 0; i < message_pairs.length; i++) { // builds the list of message components to render, for ever item in the message_pairs
-        const user_messages = message_pairs[i][0] // user message is the first item of the message pair item
-        const ai_response = message_pairs[i][1] // ai response is the first item of the message pair item
+    for (let i = 0; i < messagePairs.length; i++) { // builds the list of message components to render, for ever item in the messagePairs
+        const userMessages = messagePairs[i][0] // user message is the first item of the message pair item
+        const aiResponse = messagePairs[i][1] // ai response is the first item of the message pair item
 
         
-        if (user_messages) { // renders the user message if it exists
+        if (userMessages) { // renders the user message if it exists
             messagesList.push(
                 <div key={`user-${i}`} className="message-user">
                     <ReactMarkdown remarkPlugins={[remarkBreaks]}>
-                        {String(user_messages[2] || "")}
+                        {String(userMessages[2] || "")}
                     </ReactMarkdown>
                 </div>
             )
         }
 
         
-        if (ai_response) { // renders the ai message if it exists, along with confidence flag and show sources button
+        if (aiResponse) { // renders the ai message if it exists, along with confidence flag and show sources button
+            console.log("ai_response:", aiResponse)
             messagesList.push(
                 <div key={`ai-${i}`} className="message-ai">
                     <ReactMarkdown remarkPlugins={[remarkBreaks]}>
-                        {String(ai_response[2] || "")}
+                        {String(aiResponse[2] || "")}
                     </ReactMarkdown>
 
                     <div className="confidence-citations">
-                        <button onClick={() => fetchCitations(ai_response[0], setSelectedCitations)}>Show Sources</button>
-                        <ConfidenceFlag confidence={ai_response[3]} />
+                        <button onClick={() => fetchCitations(aiResponse[0], setSelectedCitations)}>Show Sources</button>
+                        <ConfidenceFlag confidence={aiResponse[3]} confidenceReason={aiResponse[4]} />
                     </div>
                 </div>
             )

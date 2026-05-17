@@ -21,7 +21,7 @@ load_dotenv("API.env") # loads the API keys
 app = FastAPI() # creates the FastAPI server
 
 init_db() # this initalise the database
-os.makedirs("uploads", exist_ok=True) # this creates an empty uploads folder 
+
 ##############################################
 #                                            #
 #              REUSED FUNCTIONS              #
@@ -40,9 +40,9 @@ def parse_response(ai_response):
     
     confidence = parsed.get("confidence", "") # get the parsed json confidence number but falls back to an empty string
     confidence_reason = parsed.get("confidence_reason", "")
-    citations = parsed.get("citations", []) #gets the list of citations but falls back to an empty array 
+    citations = parsed.get("citations", []) # gets the list of citations but falls back to an empty array 
     
-    confidence_score = confidence.split("/")[0].strip()
+    confidence_score = confidence.split("/")[0].strip() # splits and stips the confidence score form "X/10" to just X
     
     return {
         "message_text": message_text,
@@ -64,11 +64,11 @@ def save_citations(cursor, citations, message_id, file=None, chatSessionID=None)
         if source != "uploaded document" and source != "uploaded": # check source type
             source = "External Source" # relabels to be consistent with the database
 
-            cursor.execute("INSERT OR IGNORE INTO citations (citationSource, citationName, citationText, citationURL) VALUES (?, ?, ?, ?)", (source, c["name"], c["text"], c["url"])) # added or ignores this citation row to the database
+            cursor.execute("INSERT INTO citations (citationSource, citationName, citationText, citationURL) VALUES (?, ?, ?, ?)", (source, c["name"], c["text"], c["url"])) # added or ignores this citation row to the database
 
             cursor.execute("SELECT citationID FROM citations WHERE citationURL = ? AND citationName = ?", (c["url"], c["name"]))
 
-            citation = cursor.fetchone()
+            citation = cursor.fetchone() # if there is two source iwth the same name, the URL should be diffrent other wise it is just one source
 
             if citation:
                 citation_id = citation[0]  # get the citation id
@@ -411,9 +411,9 @@ def get_messages(chatSessionID: int = None, tempChatSessionID: int = None):
     cursor = connection.cursor()
     
     if chatSessionID: # checks if its chatSessionID for logged in users
-        cursor.execute("SELECT messageID, sender, messageContent, messageConfidence FROM messages WHERE chatSessionID = ?", (chatSessionID,))
+        cursor.execute("SELECT messageID, sender, messageContent, messageConfidence, messageConfidenceReason  FROM messages WHERE chatSessionID = ?", (chatSessionID,))
     elif tempChatSessionID: #checks if its tempChatSessionID for not logged in users
-        cursor.execute("SELECT messageID, sender, messageContent, messageConfidence FROM messages WHERE tempChatSessionID = ?", (tempChatSessionID,))
+        cursor.execute("SELECT messageID, sender, messageContent, messageConfidence, messageConfidenceReason  FROM messages WHERE tempChatSessionID = ?", (tempChatSessionID,))
     else:
         return {"success": False, "message": "No chat session or temporary chat specified."}
     
@@ -498,7 +498,7 @@ def submit_logged_prompt(data: dict = Body(...)):
     connection.commit()
     connection.close()
 
-    return {"success": True, "message": message_text, "confidence": confidence_score, "messageID": message_id}
+    return {"success": True, "message": message_text, "confidence": confidence_score, "confidenceReason": confidence_reason, "messageID": message_id}
 
 @app.post("/api/submitunloggedprompt")
 def submit_unlogged_prompt(data: dict = Body(...)):
@@ -565,7 +565,7 @@ def submit_unlogged_prompt(data: dict = Body(...)):
     connection.commit()
     connection.close()
 
-    return {"success": True, "message": message_text, "confidence": confidence_score, "messageID": message_id}
+    return {"success": True, "message": message_text, "confidence": confidence_score, "confidenceReason": confidence_reason, "messageID": message_id}
 
 #######################################
 #                                     #
@@ -580,6 +580,8 @@ async def upload_document(file: UploadFile = File(...), chatSessionID: int = For
     #   This function saves any uploaded document into the database   #
     #                                                                 #
     ###################################################################
+    
+    os.makedirs("uploads", exist_ok=True) # this creates an empty uploads folder 
 
     file_path = "uploads/" + str(chatSessionID) + "_" + file.filename #this prevents clashing document names
 
