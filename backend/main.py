@@ -9,18 +9,19 @@
 
 import bcrypt
 import json
+import os
 from fastapi import FastAPI, Body, UploadFile, File, Form
 from fastapi.responses import FileResponse
 from database import init_db, get_connection
 from dotenv import load_dotenv
 from aiservice import call_ai
 
-load_dotenv("API.env")
+load_dotenv("API.env") # loads the API keys
 
-app = FastAPI()
+app = FastAPI() # creates the FastAPI server
 
-init_db()
-
+init_db() # this initalise the database
+os.makedirs("uploads", exist_ok=True) # this creates an empty uploads folder 
 ##############################################
 #                                            #
 #              REUSED FUNCTIONS              #
