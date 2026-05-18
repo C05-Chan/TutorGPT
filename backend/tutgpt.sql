@@ -6,7 +6,7 @@
 CREATE TABLE IF NOT EXISTS users (
     userID INTEGER PRIMARY KEY,
     username TEXT NOT NULL,
-    email TEXT UNIQUE,
+    email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
     createDate TEXT DEFAULT (DATETIME('now')),
     deleteDate TEXT
