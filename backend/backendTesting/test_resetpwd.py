@@ -3,10 +3,13 @@ NEW_PASSWORD = "mynewpassword456"
 ORIGINAL_PASSWORD = "password123"
 
 def test_reset_password_success(client):
+    # this tests the reset password endpoint with valid data and checks if the response is successful
+    
     response = client.post("/api/resetpassword", json={
         "email": RESET_EMAIL,
         "password": NEW_PASSWORD
     })
+    
     data = response.json()
     assert response.status_code == 200
     assert data["success"] == True

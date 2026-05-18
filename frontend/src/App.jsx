@@ -18,6 +18,7 @@ function App() {
   const [page, setPage] = useState("home") // tracks which page is currently displayed
 
   useEffect(() => {
+
     // applies the user's saved visual settings as soon as the app loads
     const displayMode = localStorage.getItem("displayMode") || "Light"
     const displayTextSize = localStorage.getItem("displayTextSize") || "Medium"
@@ -27,7 +28,8 @@ function App() {
 
   return (
     <>
-      <TopNavbar setPage={setPage} />
+      {/* the navigation bar is always at the top across all pages */}
+      <TopNavbar setPage={setPage} /> 
 
       {/* conditionally renders the current page based on the page state */}
       {page === "home" && <Home setPage={setPage} />}

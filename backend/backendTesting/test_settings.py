@@ -2,6 +2,8 @@ SEEDED_EMAIL = "testuser@fakemail.com"
 SEEDED_USER_ID = 1
 
 def test_get_user_info_success(client):
+    # this tests the user info endpoint with a valid email and checks if the correct user info is returned
+    
     response = client.get("/api/userinfo", params={"email": SEEDED_EMAIL})
     data = response.json()
     assert response.status_code == 200
@@ -9,15 +11,21 @@ def test_get_user_info_success(client):
     assert "username" in data
 
 def test_get_user_info_not_found(client):
+    # this tests the user info endpoint with an email that is not in the test database and checks if the correct error response is returned
+    
     response = client.get("/api/userinfo", params={"email": "ghost@nowhere.com"})
     assert response.json()["error"] == True
 
 def test_get_user_settings_success(client):
+    # this tests the user settings endpoint with a valid user ID and checks if the correct settings are returned
+    
     response = client.get("/api/userSettings", params={"user_id": SEEDED_USER_ID})
     assert response.status_code == 200
     assert "settings" in response.json()
 
 def test_update_settings_success(client):
+    # this tests the update settings endpoint with valid data and checks if the response is successful
+    
     response = client.post("/api/updateSettings", json={
         "userID": SEEDED_USER_ID,
         "responseLength": "Long",
@@ -28,8 +36,9 @@ def test_update_settings_success(client):
     assert response.status_code == 200
     assert response.json()["success"] == True
     
-def test_settings_persist_after_multiple_updates(client):
-    # Regression: saving settings twice shouldn't corrupt values
+def test_settings_regression_multiple_updates(client):
+    # this is a regression test that checks if updating settings multiple times works correctly 
+    
     client.post("/api/updateSettings", json={
         "userID": SEEDED_USER_ID, "responseLength": "Short",
         "displayMode": "Light", "displayTextSize": "Small", "displayFontStyle": "Arial"
@@ -42,8 +51,11 @@ def test_settings_persist_after_multiple_updates(client):
     assert settings["responseLength"] == "Long"
     assert settings["displayMode"] == "Dark"
 
-def test_full_signup_settings_created_and_updatable(client):
-    # Integration: sign up → check default settings → update → verify persisted
+def test_integration_signup_settings_created_and_updatable(client):
+    # this is an integration test that covers the full flow of signing up a new user
+    # checking they have default settings, 
+    # updating those settings and then checking the updated settings are correct
+
     client.post("/api/signup", json={
         "username": "Settings User",
         "email": "settingsuser@test.com",

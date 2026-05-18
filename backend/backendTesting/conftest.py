@@ -1,11 +1,11 @@
 import pytest, sqlite3, os, sys
-
-# This lets Python find main.py in the parent folder
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 import database
 from main import app
 from fastapi.testclient import TestClient
+
+
+# This lets Python find main.py in the parent folder
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Use a separate test database so we don't touch the real one
 TEST_DB_PATH = os.path.join(os.path.dirname(__file__), "test_tutgpt.db")

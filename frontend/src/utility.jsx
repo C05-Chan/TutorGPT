@@ -38,6 +38,7 @@ export async function getUserInfo(email) {
 
 export async function fetchChatInfo(setChatTitle) {
     if (localStorage.getItem("userID")) {
+        
         // logged in user: fetches chat info using the permanent chat session ID
         const res = await fetch(`/api/getchatinfo?chatSessionID=${localStorage.getItem("chatSessionID")}`, {
             method: "GET",
@@ -49,6 +50,7 @@ export async function fetchChatInfo(setChatTitle) {
         console.log(data)
         return data
     } else {
+
         // guest user: fetches chat info using the temporary chat session ID
         const res = await fetch(`/api/gettempchatinfo?tempChatSessionID=${localStorage.getItem("tempChatSessionID")}`, {
             method: "GET",

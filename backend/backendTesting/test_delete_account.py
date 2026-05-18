@@ -26,7 +26,7 @@ def test_deleted_account_cannot_login(client):
     })
     assert response.json()["success"] == False
 
-def test_full_delete_clears_everything(client):
+def test_integration_delete_clears_everything(client):
     # Integration: delete → email gone → login fails
     client.post("/api/signup", json={
         "username": "Delete Flow User",
