@@ -34,8 +34,9 @@ def parse_response(ai_response):
     #   This function changes the ai response from json to a python dictionary and gets the data inside    #
     #                                                                                                      #
     ########################################################################################################
-    
+
     parsed = json.loads(ai_response) # this convert the ai response to python diction from json string
+    
     message_text = parsed.get("response", ai_response) # this retrieves the parsed json response or just falls back to the ai_response if there is not response key 
     
     confidence = parsed.get("confidence", "") # get the parsed json confidence number but falls back to an empty string
