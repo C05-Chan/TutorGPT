@@ -3,23 +3,35 @@ import { test, expect, beforeEach, vi } from "vitest"
 import ChatPromptBar from "../components/ChatPromptBar.jsx"
 
 beforeEach(() => {
+    // this clears localStorage and creates a mock function before each test
+    // makes a clean and isolated state
+
     localStorage.clear()
     global.fetch = vi.fn()
 })
 
 test("renders input and send button", () => {
+    // this tests the text input
+    // and send button are present on render
+
     render(<ChatPromptBar messages={[]} setMessage={vi.fn()} />)
     expect(screen.getByPlaceholderText("Enter your question or topic here...")).toBeInTheDocument()
     expect(screen.getByRole("button")).toBeInTheDocument()
 })
 
 test("shows error when prompt is empty", async () => {
+    // this tests submitting an empty input
+    // makes sure the prompt field has input
+
     render(<ChatPromptBar messages={[]} setMessage={vi.fn()} />)
     fireEvent.click(screen.getByRole("button"))
     expect(await screen.findByText("Please enter a prompt.")).toBeInTheDocument()
 })
 
 test("shows error when prompt is over 100 characters", async () => {
+    // this tests a prompt exceeding 100 characters
+    // makes sure prompt is not over character limit
+
     render(<ChatPromptBar messages={[]} setMessage={vi.fn()} />)
     const input = screen.getByPlaceholderText("Enter your question or topic here...")
     fireEvent.change(input, { target: { value: "a".repeat(101) } })
@@ -28,6 +40,9 @@ test("shows error when prompt is over 100 characters", async () => {
 })
 
 test("shows timer error when submitting too quickly", async () => {
+    // this tests sending a second submission immediately after the first
+    // shows cooldown timer
+
     localStorage.setItem("userID", "1")
     global.fetch.mockResolvedValue({
         json: async () => ({ success: true, message: "response", confidence: "9", messageID: 1 })
@@ -48,6 +63,9 @@ test("shows timer error when submitting too quickly", async () => {
 })
 
 test("shows character count", () => {
+    // this tests the character counter
+    // updates correctly as the user types
+    
     render(<ChatPromptBar messages={[]} setMessage={vi.fn()} />)
     const input = screen.getByPlaceholderText("Enter your question or topic here...")
     fireEvent.change(input, { target: { value: "hello" } })
