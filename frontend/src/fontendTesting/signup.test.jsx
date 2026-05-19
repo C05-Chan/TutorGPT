@@ -6,7 +6,7 @@ vi.mock("../utility.jsx", () => ({
     // this mocks the utility module so that localStorageSettingsLoader
     // and getUserInfo do not make real calls during tests
 
-    localStorageSettingsLoader: vi.fn(),
+    localStorageSettingsLoader: vi.fn(), // this is a mock function
     getUserInfo: vi.fn(),
 }))
 

@@ -84,7 +84,20 @@ def call_gemini_model(full_prompt, subject, level, response_length):
         print("[AI] Warning: No response from Gemini")
         return "Error: No response"
 
-    return response.text
+
+    # this strips the response of any markdown formatting that Gemini might add
+    text = response.text.replace('\n', ' ').strip()  
+
+    if text.startswith("```"):
+        text = text.split("```", 2)[-1]  # splits on the opening (```) and takes everything AFTER it
+        
+        if text.startswith("json"):  # checks if Gemini added a language tag after the opening fence e.g. ```json
+            text = text[4:]  # removes the 4 characters "json" from the start
+            
+        text = text.split("```")[0].strip()  # splits on the closing (```) from the right and takes everything BEFORE it, then removes any remaining whitespace
+
+
+    return text
 
 def call_ai(full_prompt, subject, level, response_length = 'Medium'):
     ##########################################################################################
@@ -97,9 +110,12 @@ def call_ai(full_prompt, subject, level, response_length = 'Medium'):
     
     try: # tries calling Gemini fallback
         print("[AI] Trying Gemini ...")
-        return call_gemini_model(full_prompt, subject, level, response_length) # if it works it calls the gemini model
+        result = call_gemini_model(full_prompt, subject, level, response_length) # if it works it calls the gemini model
+
+        json.loads(result)
+        return result
     except Exception as explain: # catches any error
-        print(f"[AI] Gemini also failed - {explain}")
+        print(f"[AI] Gemini failed - {explain}")
         
     try: # tries calling Github model
         print("[AI] Trying GitHub fallback...")

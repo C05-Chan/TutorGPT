@@ -90,17 +90,17 @@ function Home({ setPage }) {
         const chatLists = [];
         for (let i = 0; i < chats.length; i++) {
             chatLists.push(
-                <div key={i} className="home-card home-card--chat">
+                <div key={i} className="home-card home-card-chat">
 
-                    <button className="home-card__body" 
+                    <button className="home-card-body" 
                         onClick={() => {
                             localStorage.setItem("chatSessionID", chats[i][0]);
                             setPage("continuechat");
                         }}>
-                        <span className="home-card__title">Continue Chat: {chats[i][1]}</span>
+                        <span className="home-card-title">Continue Chat: {chats[i][1]}</span>
                     </button>
 
-                    <button className="home-card__delete"
+                    <button className="home-card-delete"
                         onClick={() => {
                             console.log("delete clicked", chats[i][0]) 
                             deleteChat(chats[i][0], setChats)
@@ -120,11 +120,11 @@ function Home({ setPage }) {
                 <div className="home-container">
                     <h2 className="home-title">Welcome back, {username}!</h2>
                     <div className="home-grid">
-                        <button className="home-card home-card--new" 
+                        <button className="home-card home-card-new" 
                             onClick={() => 
                                 setPage("newchatinfo")
                             }>
-                            <span className="home-card__new">+</span>
+                            <span className="home-card-newTitle">+</span>
                         </button>
                         {chatLists}
                     </div>
@@ -134,11 +134,11 @@ function Home({ setPage }) {
             return (
                 <div className="home-container">
                     <div className="home-grid">
-                        <button className="home-card home-card--new" 
+                        <button className="home-card home-card-new" 
                             onClick={() => 
                                 setPage("newchatinfo")
                             }>
-                            <span className="home-card__new">+</span>
+                            <span className="home-card-newTitle">+</span>
                         </button>
                         {chatLists}
                     </div>
@@ -150,11 +150,11 @@ function Home({ setPage }) {
     return (
         <div className="home-container">
             <div className="home-grid">
-                <button className="home-card home-card--new" 
+                <button className="home-card home-card-new" 
                     onClick={() => 
                         setPage("newchatinfo")
                     }>
-                    <span className="home-card__new">+</span>
+                    <span className="home-card-newTitle">+</span>
                 </button>
             </div>
         </div>
