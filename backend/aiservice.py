@@ -109,6 +109,3 @@ def call_ai(full_prompt, subject, level, response_length = 'Medium'):
         return "The AI is currently unavailable. Please try again in a moment."  
 
     
-
-
-    
