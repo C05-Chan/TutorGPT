@@ -1,25 +1,25 @@
-SEEDED_EMAIL = "testuser@fakemail.com"
-SEEDED_USER_ID = 1
+ORIGINAL_EMAIL = "testuser@fakemail.com"
+ORIGINAL_USER_ID = 1
 
 def test_get_user_info_success(client):
     # this tests the user info endpoint with a valid email and checks if the correct user info is returned
     
-    response = client.get("/api/userinfo", params={"email": SEEDED_EMAIL})
+    response = client.get("/api/userinfo", params={"email": ORIGINAL_EMAIL})
     data = response.json()
     assert response.status_code == 200
-    assert data["userID"] == SEEDED_USER_ID
+    assert data["userID"] == ORIGINAL_USER_ID
     assert "username" in data
 
 def test_get_user_info_not_found(client):
     # this tests the user info endpoint with an email that is not in the test database and checks if the correct error response is returned
     
     response = client.get("/api/userinfo", params={"email": "ghost@nowhere.com"})
-    assert response.json()["error"] == True
+    assert response.json()["success"] == False
 
 def test_get_user_settings_success(client):
     # this tests the user settings endpoint with a valid user ID and checks if the correct settings are returned
     
-    response = client.get("/api/userSettings", params={"user_id": SEEDED_USER_ID})
+    response = client.get("/api/userSettings", params={"user_id": ORIGINAL_USER_ID})
     assert response.status_code == 200
     assert "settings" in response.json()
 
@@ -27,7 +27,7 @@ def test_update_settings_success(client):
     # this tests the update settings endpoint with valid data and checks if the response is successful
     
     response = client.post("/api/updateSettings", json={
-        "userID": SEEDED_USER_ID,
+        "userID": ORIGINAL_USER_ID,
         "responseLength": "Long",
         "displayMode": "Dark",
         "displayTextSize": "Large",
@@ -40,14 +40,14 @@ def test_settings_regression_multiple_updates(client):
     # this is a regression test that checks if updating settings multiple times works correctly 
     
     client.post("/api/updateSettings", json={
-        "userID": SEEDED_USER_ID, "responseLength": "Short",
+        "userID": ORIGINAL_USER_ID, "responseLength": "Short",
         "displayMode": "Light", "displayTextSize": "Small", "displayFontStyle": "Arial"
     })
     client.post("/api/updateSettings", json={
-        "userID": SEEDED_USER_ID, "responseLength": "Long",
+        "userID": ORIGINAL_USER_ID, "responseLength": "Long",
         "displayMode": "Dark", "displayTextSize": "Large", "displayFontStyle": "Times New Roman"
     })
-    settings = client.get("/api/userSettings", params={"user_id": SEEDED_USER_ID}).json()["settings"]
+    settings = client.get("/api/userSettings", params={"user_id": ORIGINAL_USER_ID}).json()["settings"]
     assert settings["responseLength"] == "Long"
     assert settings["displayMode"] == "Dark"
 

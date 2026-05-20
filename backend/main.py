@@ -230,7 +230,7 @@ def get_user(email: str):
     if result:
         return {"userID": result[0], "username": result[1]}
     else:
-        return {"error": True, "message": "User not found."}
+        return {"success": False, "message": "User not found."}
 
 ##################################
 #                                #
