@@ -44,7 +44,7 @@ test("shows error when email has no @", async () => {
     // makes sure email is valid
 
     render(<Signup setPage={vi.fn()} />)
-    fillForm({ username: "crystal", email: "testtest.com", password: "password123", confirm: "password123" })
+    fillForm({ username: "test user", email: "testtest.com", password: "password123", confirm: "password123" })
     fireEvent.click(screen.getByRole("button", { name: "Sign Up" }))
     expect(await screen.findByText(/must include @ symbol/)).toBeInTheDocument()
 })
@@ -54,7 +54,7 @@ test("shows error when passwords do not match", async () => {
     // makes sure passwords match
 
     render(<Signup setPage={vi.fn()} />)
-    fillForm({ username: "crystal", email: "test@test.com", password: "password123", confirm: "different123" })
+    fillForm({ username: "test user", email: "test@test.com", password: "password123", confirm: "different123" })
     fireEvent.click(screen.getByRole("button", { name: "Sign Up" }))
     expect(await screen.findByText("Passwords do not match.")).toBeInTheDocument()
 })
@@ -64,7 +64,7 @@ test("shows error when password is too short", async () => {
     // makes sure password is not too short
 
     render(<Signup setPage={vi.fn()} />)
-    fillForm({ username: "crystal", email: "test@test.com", password: "short", confirm: "short" })
+    fillForm({ username: "test user", email: "test@test.com", password: "short", confirm: "short" })
     fireEvent.click(screen.getByRole("button", { name: "Sign Up" }))
     expect(await screen.findByText(/Password must be at least 8 characters/)).toBeInTheDocument()
 })

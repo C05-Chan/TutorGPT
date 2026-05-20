@@ -7,7 +7,7 @@ test("renders login form", () => {
     // and displays its heading correctly
 
     render(<Login setPage={vi.fn()} />)
-    expect(screen.getByRole("heading", { name: "Login" })).toBeInTheDocument() // finds the heading element with text "Login" and checks if it's in the DOM
+    expect(screen.getByRole("heading", { name: "Login" })).toBeInTheDocument() 
 })
 
 test("shows error when fields are empty", async () => {

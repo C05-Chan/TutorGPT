@@ -108,14 +108,14 @@ def call_ai(full_prompt, subject, level, response_length = 'Medium'):
     #                                                                                        #
     ##########################################################################################
     
-    try: # tries calling Gemini fallback
-        print("[AI] Trying Gemini ...")
-        result = call_gemini_model(full_prompt, subject, level, response_length) # if it works it calls the gemini model
+    # try: # tries calling Gemini fallback
+    #     print("[AI] Trying Gemini ...")
+    #     result = call_gemini_model(full_prompt, subject, level, response_length) # if it works it calls the gemini model
 
-        json.loads(result)
-        return result
-    except Exception as explain: # catches any error
-        print(f"[AI] Gemini failed - {explain}")
+    #     json.loads(result)
+    #     return result
+    # except Exception as explain: # catches any error
+    #     print(f"[AI] Gemini failed - {explain}")
         
     try: # tries calling Github model
         print("[AI] Trying GitHub fallback...")
