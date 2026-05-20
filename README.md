@@ -55,9 +55,10 @@ cd TutorGPT
 4. Extract the ZIP file4
 5. Open a terminal inside the extracted folder
 
+----------------------------------------------------------
+
 Install all dependencies:
 
-Run this command first regardless of the machine/ OS:
 ``` 
 npm install 
 ```
