@@ -14,6 +14,7 @@ function fillForm({ username = "", email = "", password = "", confirm = "" }) {
     // this is a helper that fills in whichever signup form fields are provided
     // and skips any that are left empty
 
+    // allows tests to  fill in the form with different combinations of valid and invalid input by only specifying the fields they want to fill
     if (username) fireEvent.change(screen.getByLabelText("Username:"), { target: { value: username } })
     if (email) fireEvent.change(screen.getByLabelText("Email:"), { target: { value: email } })
     if (password) fireEvent.change(screen.getByLabelText("Password:"), { target: { value: password } })
@@ -74,7 +75,7 @@ test("navigates to login page", () => {
     // calls setPage with the correct route key
 
     const setPage = vi.fn()
-    render(<Signup setPage={setPage} />)
-    fireEvent.click(screen.getByRole("button", { name: "Login" }))
-    expect(setPage).toHaveBeenCalledWith("login")
+    render(<Signup setPage={setPage} />) // render the Signup component with a mock setPage function
+    fireEvent.click(screen.getByRole("button", { name: "Login" })) // click the Login button
+    expect(setPage).toHaveBeenCalledWith("login") // this checks that setPage was called with "login" when the Login button is clicked
 })

@@ -18,7 +18,7 @@ export default function TopNavbar({ setPage }) {
           </button>
         </div>
         
-        <h1 className="logo">Tutor-GPT</h1>
+        <h1 className="logo">TutorGPT</h1>
         
         <div className="navbar-right">
 
@@ -43,7 +43,7 @@ export default function TopNavbar({ setPage }) {
 
       </div>
       
-      <h1 className="logo">Tutor-GPT</h1>
+      <h1 className="logo">TutorGPT</h1>
       
       <div className="navbar-right">
 

@@ -29,14 +29,16 @@ You only need to do this once on your machine.
 This app uses two AI services:
 > Both keys are free to use within their rate limits.
 
-- **GitHub Models (GPT-4o mini)** — Primary AI
+- **Google Gemini (gemini-2.5-flash)** — Primary AI service
+  - Requires a Google account
+  - Get your API key at: https://aistudio.google.com/app/apikey
+
+- **GitHub Models (GPT-4o mini)** —  Fallback AI (used if Gemini fails)
   - Requires a GitHub account
   - Get your token at: https://github.com/settings/tokens
   - The token needs the **"models:read"** permission
 
-- **Google Gemini (gemini-2.5-flash)** — Fallback AI (used if GitHub fails)
-  - Requires a Google account
-  - Get your API key at: https://aistudio.google.com/app/apikey
+
 
 
 ---
@@ -52,28 +54,25 @@ cd TutorGPT
 1. Go to https://github.com/C05-Chan/TutorGPT
 2. Click the green **"Code"** button
 3. Click **"Download ZIP"**
-4. Extract the ZIP file4
+4. Extract the ZIP file
 5. Open a terminal inside the extracted folder
 
 ----------------------------------------------------------
 
-Install all dependencies:
-
-``` 
+Install all dependencies: 
+```
 npm install 
 ```
 
+The setup the dependencies:
+
 **Mac:**
-```bash
-npm run setup:mac
-```
+```npm run setup:mac```
 
 **Windows:**
-```powershell
-npm run setup:windows
-```
+```npm run setup:windows```
 
-This may take up to 5 minutes.
+This may take up to 5 minutes. Please just let it run.
 
 
 ---
@@ -94,13 +93,9 @@ Replace the values with your actual API keys.
 ## Running the App
 
 **Mac:**
-```bash
-npm run start:mac
-```
+```npm run start:mac```
 
 **Windows:**
-```powershell
-npm run start:windows
-```
+```npm run start:windows```
 
 Then open your browser and go to: http://localhost:5173
